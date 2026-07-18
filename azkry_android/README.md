@@ -2,7 +2,7 @@
 
 Native Android app for Azkry — an Arabic-first, offline-first Islamic adhkar app: prayer times, adhkar with tap counters, worship tracking, and (later) Quran reading. Built with Kotlin, Jetpack Compose, Hilt, and a local Room database. There is no backend: every feature works fully offline on the phone's local database.
 
-The visual contract is the set of screenshots in [`../design/`](../design) — dark starry UI, RTL Arabic.
+The visual contract is the reference iOS Athkar app's design — dark starry UI, RTL Arabic — captured in writing in the "Design identity" section of [AGENTS.md](./AGENTS.md).
 
 ## Requirements
 
@@ -59,7 +59,7 @@ Daily data keys on the local ISO date, so a new day naturally starts fresh witho
 
 ## Prayer Times
 
-`core/prayertimes/PrayerTimeCalculator.kt` computes times astronomically (no network, no third-party library): MWL, Egyptian, Umm al-Qura, Karachi, ISNA, and the France 15°/12° angle conventions; Shafii/Hanafi Asr; angle-based, middle-of-the-night, and seventh-of-the-night high-latitude rules. Accuracy is within a minute or two of reference implementations, matching the tolerance the design's settings page communicates to users.
+`core/prayertimes/PrayerTimeCalculator.kt` computes times astronomically (no network, no third-party library): MWL, Egyptian, Umm al-Qura, Karachi, ISNA, and the France 15°/12° angle conventions; Shafii/Hanafi Asr; angle-based, middle-of-the-night, and seventh-of-the-night high-latitude rules. Accuracy is within a minute or two of reference implementations, matching the tolerance the reference app's settings page communicates to users.
 
 The default location is Mecca until the user configures their city in settings (auto-location is a later feature).
 

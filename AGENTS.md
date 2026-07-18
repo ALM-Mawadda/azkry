@@ -8,8 +8,6 @@ Azkry (أذكاري) is an Arabic-first, offline-first Islamic adhkar app: praye
 
 - `azkry_android/`
   Android app, native Kotlin/Compose runtime, Gradle workflow, local Room database, and app behavior
-- `design/`
-  Reference screenshots of the target UI. The app is Arabic, RTL, dark-themed; screens must match these visuals. This folder is documentation, not runtime source.
 
 ## Start Here
 
@@ -19,7 +17,7 @@ Azkry (أذكاري) is an Arabic-first, offline-first Islamic adhkar app: praye
 ## Ownership Rules
 
 - Keep Android implementation, Gradle commands, Compose screens, database schema, and app configuration in `azkry_android` docs.
-- The design screenshots in `design/` are the visual contract. When a screen diverges from its screenshot, the screenshot wins unless a platform rule forces a deviation.
+- The visual contract is the reference iOS Athkar app (أذكار). Its screenshots are kept out of this public repo; the durable, written form of that contract is the "Design identity" section in `azkry_android/AGENTS.md` — when a screen diverges from it, the contract wins unless a platform rule forces a deviation.
 - Use focused inspection and verification rather than broad repo-wide commands when possible.
 - Update the relevant domain docs in the same task when runtime behavior, commands, or invariants change.
 
