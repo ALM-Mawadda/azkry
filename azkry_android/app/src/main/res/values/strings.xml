@@ -1,0 +1,241 @@
+<resources>
+    <string name="app_name">أذكاري</string>
+
+    <!-- Common -->
+    <string name="action_back">رجوع</string>
+    <string name="action_close">إغلاق</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="action_search">بحث</string>
+    <string name="action_bookmarks">المحفوظات</string>
+    <string name="action_play">تشغيل</string>
+    <string name="action_share">مشاركة</string>
+    <string name="coming_soon">قريبًا</string>
+    <string name="error_generic">حدث خطأ ما، حاول مرة أخرى</string>
+
+    <!-- Home tabs -->
+    <string name="tab_misc">المنوعة</string>
+    <string name="tab_prayer">الصلاة</string>
+    <string name="tab_qibla">القبلة</string>
+    <string name="tab_favorites">المفضلة</string>
+    <string name="tab_counter">العداد</string>
+
+    <!-- Home sections -->
+    <string name="home_worship_tracking">متابعة العبادات</string>
+    <string name="home_mushaf">المصحف</string>
+    <string name="home_adhkar_duas">الأذكار والأدعية</string>
+    <string name="home_comprehensive_duas">أدعية شاملة</string>
+    <string name="home_comprehensive_duas_subtitle">أدعية شاملة في صفحة واحدة</string>
+    <string name="home_pages">صفحات</string>
+    <string name="home_friday">الجمعة</string>
+    <string name="home_exclusive">النسخة الحصرية</string>
+    <string name="home_all_sections">جميع الأقسام</string>
+
+    <!-- Prayer names -->
+    <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_sunrise">الشروق</string>
+    <string name="prayer_dhuhr">الظهر</string>
+    <string name="prayer_asr">العصر</string>
+    <string name="prayer_maghrib">المغرب</string>
+    <string name="prayer_isha">العشاء</string>
+
+    <!-- Adhan countdown -->
+    <string name="countdown_line">%1$s بعد  %2$s</string>
+    <string name="adhan_now">حان الآن أذان %1$s</string>
+
+    <!-- Worship tracking -->
+    <string name="tracking_title">متابعة العبادات</string>
+    <string name="tracking_section_prayers">الصلوات</string>
+    <string name="tracking_section_adhkar">الأذكار</string>
+    <string name="tracking_section_quran">القرآن الكريم</string>
+    <string name="tracking_section_daily_worships">عبادات يومية</string>
+    <string name="tracking_section_rawatib">سنن رواتب</string>
+    <string name="tracking_section_other">أخرى</string>
+    <string name="tracking_quran_daily">قراءة القرآن</string>
+    <string name="tracking_quran_daily_subtitle">ورد يومي من القرآن الكريم</string>
+    <string name="tracking_kahf">قراءة سورة الكهف</string>
+    <string name="tracking_kahf_subtitle">سنة قراءتها يوم الجمعة</string>
+    <string name="tracking_duha">صلاة الضحى</string>
+    <string name="tracking_duha_subtitle">من 2 إلى 8 ركعات بعد شروق الشمس</string>
+    <string name="tracking_rawatib_fajr">سنة الفجر</string>
+    <string name="tracking_rawatib_fajr_subtitle">ركعتان قبل صلاة الفجر</string>
+    <string name="tracking_rawatib_dhuhr_before">سنة الظهر القبلية</string>
+    <string name="tracking_rawatib_dhuhr_before_subtitle">4 ركعات قبل صلاة الظهر</string>
+    <string name="tracking_rawatib_dhuhr_after">سنة الظهر البعدية</string>
+    <string name="tracking_rawatib_dhuhr_after_subtitle">ركعتان بعد صلاة الظهر</string>
+    <string name="tracking_rawatib_maghrib">سنة المغرب</string>
+    <string name="tracking_rawatib_maghrib_subtitle">ركعتان بعد صلاة المغرب</string>
+    <string name="tracking_rawatib_isha">سنة العشاء</string>
+    <string name="tracking_rawatib_isha_subtitle">ركعتان بعد صلاة العشاء</string>
+    <string name="tracking_qiyam">قيام الليل</string>
+    <string name="tracking_qiyam_subtitle">من بعد صلاة العشاء حتى طلوع الفجر</string>
+    <string name="tracking_witr">صلاة الوتر</string>
+    <string name="tracking_witr_subtitle">ركعة أو ثلاث أو خمس أو سبع أو إحدى عشرة</string>
+
+    <!-- Dhikr reader -->
+    <string name="reader_finished_prompt">انتهيت من %1$s؟</string>
+    <string name="reader_hint_tap">اضغط مرة واحدة على النص لزيادة العداد.</string>
+    <string name="reader_hint_details">اضغط ضغطة مطولة على النص لمشاهدة التفاصيل.</string>
+    <string name="reader_hint_reset">اضغط ضغطة مطولة على العداد لتصفيره.</string>
+
+    <!-- Mushaf -->
+    <string name="mushaf_title">المصحف</string>
+    <string name="mushaf_last_page">آخر صفحة</string>
+    <string name="mushaf_last_ayah">آخر أية</string>
+    <string name="mushaf_tab_surahs">السور</string>
+    <string name="mushaf_tab_juzs">الأجزاء</string>
+    <string name="mushaf_meccan">مكية</string>
+    <string name="mushaf_medinan">مدنية</string>
+    <string name="mushaf_ayat_count">آياتها: %1$d</string>
+    <string name="mushaf_page_n">الصفحة %1$d</string>
+    <string name="mushaf_ayah_n">الآية %1$d</string>
+    <string name="mushaf_juz_n">الجزء %1$d</string>
+    <string name="mushaf_no_last_read">ابدأ القراءة</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_section_app">التطبيق</string>
+    <string name="settings_prayer_times">مواقيت الصلاة</string>
+    <string name="settings_language">اللغة - Language</string>
+    <string name="settings_language_value_arabic">العربية</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_appearance_value_dark">داكن</string>
+
+    <!-- Prayer time settings -->
+    <string name="prayer_settings_location">الموقع الجغرافي الحالي</string>
+    <string name="prayer_settings_coordinates">خط الطول: %1$s — خط العرض: %2$s</string>
+    <string name="prayer_settings_method">طريقة الحساب</string>
+    <string name="prayer_settings_asr">الحساب الفقهي لصلاة العصر</string>
+    <string name="prayer_settings_highlat">خط العرض المرتفع</string>
+    <string name="method_mwl">رابطة العالم الإسلامي</string>
+    <string name="method_egyptian">الهيئة المصرية العامة للمساحة</string>
+    <string name="method_umm_al_qura">أم القرى</string>
+    <string name="method_karachi">جامعة العلوم الإسلامية بكراتشي</string>
+    <string name="method_north_america">الجمعية الإسلامية لأمريكا الشمالية - زاوية 15°</string>
+    <string name="method_france15">فرنسا - زاوية 15°</string>
+    <string name="method_france12">فرنسا - زاوية 12°</string>
+    <string name="asr_shafii">شافعي | حنبلي | مالكي</string>
+    <string name="asr_hanafi">حنفي</string>
+    <string name="highlat_angle_based">الطريقة المستندة إلى الزاوية</string>
+    <string name="highlat_middle">منتصف الليل</string>
+    <string name="highlat_seventh">سُبع الليل</string>
+    <string name="highlat_none">بدون تعديل</string>
+    <string name="prayer_settings_note">قد يحدث بعض الاختلاف الطفيف بين مواقيت الصلاة التي يحسبها التطبيق ووقت الصلاة في مدينتك لا يتجاوز دقيقة أو دقيقتين، وذلك لأن وقت الصلاة يحسب في نقطة جغرافية معينة. تأكد من اختيار الطريقة السليمة لحساب مواقيت الصلاة.</string>
+    <string name="prayer_settings_use_current">📍 استخدام الموقع الحالي</string>
+    <string name="prayer_settings_city">اسم المدينة</string>
+    <string name="prayer_settings_latitude">خط العرض</string>
+    <string name="prayer_settings_longitude">خط الطول</string>
+    <string name="prayer_back_to_today">العودة إلى اليوم</string>
+    <string name="action_save">حفظ</string>
+
+    <!-- Qibla -->
+    <string name="qibla_bearing_label">اتجاه القبلة: %1$d° من الشمال</string>
+    <string name="qibla_no_compass">لا يتوفر حساس بوصلة في هذا الجهاز؛ استخدم الاتجاه المعروض مع بوصلة خارجية.</string>
+
+    <!-- Counter -->
+    <string name="counter_laps">الجولات: %1$d</string>
+    <string name="counter_hint">اضغط الدائرة للتسبيح، واضغط ضغطة مطولة لتصفير العداد.</string>
+
+    <!-- Favorites -->
+    <string name="favorites_empty">لا توجد أذكار مفضلة بعد.\nاضغط على النجمة في أي ذكر لإضافته هنا.</string>
+
+    <!-- Notifications -->
+    <string name="settings_notifications">إشعارات الأذكار والأذان</string>
+    <string name="notification_channel_adhan">الأذان</string>
+    <string name="notification_channel_adhkar">تذكير الأذكار</string>
+    <string name="notif_section_adhan">إشعارات الأذان</string>
+    <string name="notif_section_adhkar">تذكير الأذكار</string>
+    <string name="notif_adhan_row">أذان %1$s</string>
+    <string name="notif_adhan_title">حان الآن وقت صلاة %1$s</string>
+    <string name="notif_adhan_text">%1$s · %2$s</string>
+    <string name="notif_morning_adhkar">أذكار الصباح</string>
+    <string name="notif_morning_adhkar_text">لا تنس وردك من أذكار الصباح 🌅</string>
+    <string name="notif_evening_adhkar">أذكار المساء</string>
+    <string name="notif_evening_adhkar_text">لا تنس وردك من أذكار المساء 🌙</string>
+    <string name="notif_footer_note">تعمل الإشعارات محليًا على جهازك اعتمادًا على مواقيت الصلاة المحسوبة؛ لا تُرسل أي بيانات خارج الجهاز.</string>
+
+    <!-- Friday page -->
+    <string name="friday_sunan_title">سنن يوم الجمعة</string>
+    <string name="friday_ghusl">الاغتسال</string>
+    <string name="friday_perfume">التطيب</string>
+    <string name="friday_best_clothes">لبس أحسن الثياب</string>
+    <string name="friday_early_mosque">التبكير إلى المسجد</string>
+    <string name="friday_dua">الدعـــاء</string>
+    <string name="friday_kahf">قراءة سورة الكهف</string>
+    <string name="friday_open_kahf">اقرأ سورة الكهف الآن</string>
+    <string name="friday_salawat_text">اللهم صل على محمد، وعلى آل محمد، كما صليت على إبراهيم، وعلى آل إبراهيم، إنك حميد مجيد، وبارك على محمد، وعلى آل محمد، كما باركت على إبراهيم، وعلى آل إبراهيم، في العالمين إنك حميد مجيد.</string>
+    <string name="friday_fadail_title">فضائل يوم الجمعة</string>
+    <string name="friday_fadail_1">عن أبي هريرة رضي الله عنه، عن النبي صلى الله عليه وسلم أنه قال: «خير يوم طلعت فيه الشمس يوم الجمعة؛ فيه خلق الله آدم، وفيه أدخل الجنة، وفيه أخرج منها، ولا تقوم الساعة إلا في يوم الجمعة». رواه مسلم</string>
+    <string name="friday_fadail_2">ليوم الجمعة ميزات وفضائل كثيرة، فضل الله بها هذا اليوم على ما سواه من الأيام: فيه ساعة لا يوافقها عبد مسلم يسأل الله فيها خيرًا إلا أعطاه إياه، وفيه تسن قراءة سورة الكهف، والإكثار من الصلاة على النبي صلى الله عليه وسلم.</string>
+
+    <!-- Hijri calendar -->
+    <string name="calendar_title">التاريخ</string>
+    <string name="calendar_note">التقويم الهجري معتمد على حساب أم القرى، وقد يختلف يومًا واحدًا عن الرؤية المحلية للهلال.</string>
+    <string name="weekday_sat">سبت</string>
+    <string name="weekday_sun">أحد</string>
+    <string name="weekday_mon">اثنين</string>
+    <string name="weekday_tue">ثلاثاء</string>
+    <string name="weekday_wed">أربعاء</string>
+    <string name="weekday_thu">خميس</string>
+    <string name="weekday_fri">جمعة</string>
+
+    <!-- Appearance -->
+    <string name="appearance_dark">داكن</string>
+    <string name="appearance_light">فاتح</string>
+    <string name="appearance_system">حسب النظام</string>
+
+    <!-- Hijri offset -->
+    <string name="hijri_offset_title">تعديل التاريخ الهجري</string>
+    <string name="hijri_offset_value">%1$+d يوم</string>
+    <string name="hijri_offset_zero">بدون تعديل</string>
+
+    <!-- Notifications v2 -->
+    <string name="notification_channel_next_prayer">الصلاة القادمة</string>
+    <string name="notif_pre_adhan_title">أذان %1$s بعد %2$d دقيقة</string>
+    <string name="notif_next_prayer_title">الصلاة القادمة: %1$s · %2$s</string>
+    <string name="notif_pre_adhan_toggle">تنبيه قبل الأذان بـ 15 دقيقة</string>
+    <string name="notif_ongoing_toggle">إشعار دائم بالصلاة القادمة</string>
+
+    <!-- Widgets -->
+    <string name="widget_next_prayer_label">الصلاة القادمة</string>
+    <string name="widget_next_prayer_description">اسم الصلاة القادمة ووقتها</string>
+    <string name="widget_daily_dhikr_label">ذكر اليوم</string>
+    <string name="widget_daily_dhikr_description">ذكر يتجدد كل يوم</string>
+
+    <!-- Search -->
+    <string name="search_title">البحث</string>
+    <string name="search_hint">ابحث في الأذكار والسور…</string>
+    <string name="search_section_adhkar">الأذكار</string>
+    <string name="search_section_surahs">السور</string>
+    <string name="search_empty">لا توجد نتائج</string>
+
+    <!-- Dhikr details -->
+    <string name="details_title">تفاصيل الذكر</string>
+    <string name="details_repeat">عدد التكرار: %1$d</string>
+    <string name="details_today_count">عدّاد اليوم: %1$d</string>
+    <string name="details_category">القسم: %1$s</string>
+
+    <!-- Reader celebration -->
+    <string name="reader_celebration">تقبّل الله منكم 🤲</string>
+
+    <!-- Mushaf v2 -->
+    <string name="mushaf_tab_pages">الصفحات</string>
+    <string name="mushaf_bookmarks">العلامات</string>
+    <string name="mushaf_bookmark_add">إضافة علامة</string>
+    <string name="khatmah_title">ختمة</string>
+    <string name="khatmah_start_30">ابدأ ختمة في 30 يومًا</string>
+    <string name="khatmah_start_60">ابدأ ختمة في 60 يومًا</string>
+    <string name="khatmah_progress">اليوم %1$d من %2$d · وردك حتى الصفحة %3$d</string>
+    <string name="khatmah_position">موضعك الحالي: الصفحة %1$d</string>
+    <string name="khatmah_finish">إنهاء الختمة</string>
+
+    <!-- Backup -->
+    <string name="backup_title">نسخ احتياطية</string>
+    <string name="backup_export">تصدير نسخة احتياطية</string>
+    <string name="backup_import">استيراد نسخة احتياطية</string>
+    <string name="backup_export_done">تم حفظ النسخة الاحتياطية</string>
+    <string name="backup_import_done">تم استيراد النسخة الاحتياطية</string>
+    <string name="backup_failed">تعذر إتمام العملية</string>
+
+    <!-- Exclusive -->
+    <string name="exclusive_title">النسخة الحصرية</string>
+</resources>

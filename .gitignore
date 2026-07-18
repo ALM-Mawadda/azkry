@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Android
+azkry_android/.gradle/
+azkry_android/.kotlin/
+azkry_android/local.properties
+azkry_android/**/build/
+
+# JetBrains IDEs (Android Studio / IntelliJ)
+.idea/
+*.iml
+
+# Environment / secrets
+.env
+.env.*
+secrets.properties
+
+# Claude Code local settings
+.claude/
+
+# Re-include agent docs excluded by the user's global gitignore
+!/AGENTS.md
+!/azkry_android/AGENTS.md

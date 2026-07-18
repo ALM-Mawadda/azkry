@@ -1,0 +1,5 @@
+<resources>
+    <color name="splash_background">#131A3C</color>
+    <color name="window_background">#1C2732</color>
+    <color name="launcher_background">#131A3C</color>
+</resources>
