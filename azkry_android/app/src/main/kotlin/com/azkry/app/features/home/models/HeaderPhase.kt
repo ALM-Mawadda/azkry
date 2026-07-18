@@ -2,7 +2,9 @@ package com.azkry.app.features.home.models
 
 import com.azkry.app.core.models.DhikrCategoryKeys
 import com.azkry.app.core.models.Prayer
+import java.time.Duration
 import java.time.LocalTime
+import java.util.Locale
 
 /**
  * The sky the home header paints, derived from where "now" falls between the
@@ -61,5 +63,46 @@ object HomeDayView {
         HeaderPhase.Dawn, HeaderPhase.Day -> DhikrCategoryKeys.MORNING
         HeaderPhase.Afternoon, HeaderPhase.Dusk -> DhikrCategoryKeys.EVENING
         HeaderPhase.Night -> DhikrCategoryKeys.SLEEP
+    }
+
+    /**
+     * Coarse Arabic phrase for the countdown row ("٤ دقائق", "ساعة و٥٦ دقيقة").
+     * Minutes are rounded up so 3:08 left reads "بعد 4 دقائق" like the
+     * reference; western digits match the app's clock style.
+     */
+    fun countdownPhrase(remaining: Duration): String {
+        val totalSeconds = remaining.seconds.coerceAtLeast(0)
+        if (totalSeconds < 60) return "أقل من دقيقة"
+        val totalMinutes = (totalSeconds + 59) / 60
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        val hoursPart = when {
+            hours == 0L -> null
+            hours == 1L -> "ساعة"
+            hours == 2L -> "ساعتين"
+            hours in 3..10 -> "$hours ساعات"
+            else -> "$hours ساعة"
+        }
+        val minutesPart = when {
+            minutes == 0L -> null
+            minutes == 1L -> "دقيقة"
+            minutes == 2L -> "دقيقتين"
+            minutes in 3..10 -> "$minutes دقائق"
+            else -> "$minutes دقيقة"
+        }
+        return listOfNotNull(hoursPart, minutesPart).joinToString(separator = " و")
+    }
+
+    /** Precise ticking clock: H:MM:SS above an hour, M:SS below it. */
+    fun countdownClock(remaining: Duration): String {
+        val totalSeconds = remaining.seconds.coerceAtLeast(0)
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+        return if (hours > 0) {
+            String.format(Locale.ENGLISH, "%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format(Locale.ENGLISH, "%d:%02d", minutes, seconds)
+        }
     }
 }

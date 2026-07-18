@@ -30,6 +30,7 @@ fun CircleIconButton(
     modifier: Modifier = Modifier,
     tint: Color = AzkryTheme.colors.TextPrimary,
     containerColor: Color = AzkryTheme.colors.SurfaceCard,
+    borderColor: Color = AzkryTheme.colors.BorderDefault,
 ) {
     Surface(
         onClick = onClick,
@@ -37,7 +38,7 @@ fun CircleIconButton(
         shape = CircleShape,
         color = containerColor,
         contentColor = tint,
-        border = BorderStroke(1.dp, AzkryTheme.colors.BorderDefault),
+        border = BorderStroke(1.dp, borderColor),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(

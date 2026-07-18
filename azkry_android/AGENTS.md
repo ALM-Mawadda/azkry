@@ -6,7 +6,8 @@ Use this file as the operator guide for work inside `azkry_android/`. The goal i
 
 - `README.md`
 - `../AGENTS.md`
-- `../design/` — the UI contract (screenshots of the target app)
+- The "Design identity" section below — the written UI contract (the reference
+  iOS Athkar app's design; its screenshots are not kept in this public repo)
 
 ## Package Map
 
@@ -70,8 +71,13 @@ Design identity (do not regress): Almarai is the app-wide typeface; the home
 header is a **time-of-day sky** (`HeaderPhase` from prayer times → gradients,
 sun glow, stars only at night via `SkyHeader.kt`); the prayer strip frames
 "now" between the passed and upcoming events (`HomeDayView.stripEvents`); the
-countdown is yellow with live seconds; scrolling collapses the sky into a
-pinned bar (wordmark + actions + tabs via `stickyHeader`); cards are
+countdown row is a white humanized phrase ("أذان العشاء بعد 4 دقائق") with a
+yellow accent bar on the reading-start side and the gray precise ticker
+opposite (`HomeDayView.countdownPhrase/countdownClock`); header actions are
+settings/search/bookmark grouped visual-left and the play button alone
+visual-right, in indigo-ringed circles; scrolling fades the header content
+progressively (scroll-offset alpha) before collapsing into the pinned bar
+(wordmark + actions + tabs via `stickyHeader`); cards are
 soft-radius (26dp) with hairline borders; mushaf screens sit on the darker
 `MushafBackground`; the hijri chip is two-line (day over month). Header text
 is always light — it sits on the sky, not the page.

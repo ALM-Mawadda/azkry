@@ -17,7 +17,6 @@ import com.azkry.app.features.prayertimes.services.PrayerTimesService
 import com.azkry.app.features.tracking.services.WorshipTrackingService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.DayOfWeek
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -47,8 +46,10 @@ data class HomeUiState(
     /** The upcoming event (opposite side of the strip). */
     val upcomingPrayer: Prayer,
     val upcomingTime: String,
-    /** Live H:MM:SS until the next obligatory adhan. */
-    val countdown: String,
+    /** Coarse phrase until the next adhan ("٤ دقائق"), for the countdown row. */
+    val countdownPhrase: String,
+    /** Live precise ticker (M:SS or H:MM:SS) shown opposite the phrase. */
+    val countdownClock: String,
     val countdownPrayer: Prayer,
     val trackingPercent: Int,
     val isFriday: Boolean,
@@ -122,7 +123,8 @@ class HomeViewModel @Inject constructor(
                 previousTime = latestTimes.getValue(previous).format(timeFormatter),
                 upcomingPrayer = upcoming,
                 upcomingTime = latestTimes.getValue(upcoming).format(timeFormatter),
-                countdown = formatCountdown(next.remaining),
+                countdownPhrase = HomeDayView.countdownPhrase(next.remaining),
+                countdownClock = HomeDayView.countdownClock(next.remaining),
                 countdownPrayer = next.prayer,
                 trackingPercent = dayTracking.percent,
                 isFriday = LocalDate.now().dayOfWeek == DayOfWeek.FRIDAY,
@@ -137,12 +139,4 @@ class HomeViewModel @Inject constructor(
 
     private fun phaseAt(now: LocalDateTime): HeaderPhase =
         HomeDayView.phaseFor(now.toLocalTime(), latestTimes)
-
-    private fun formatCountdown(remaining: Duration): String {
-        val totalSeconds = remaining.seconds.coerceAtLeast(0)
-        val hours = totalSeconds / 3600
-        val minutes = (totalSeconds % 3600) / 60
-        val seconds = totalSeconds % 60
-        return String.format(Locale.ENGLISH, "%d:%02d:%02d", hours, minutes, seconds)
-    }
 }

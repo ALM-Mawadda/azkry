@@ -6,6 +6,18 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -134,6 +146,19 @@ fun HomeContent(
     val collapsed by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
     }
+    // Content of the sky header fades progressively with the scroll offset,
+    // like the reference — the strip dims as it slides under the pinned bar.
+    val collapseRangePx = with(LocalDensity.current) { 180.dp.toPx() }
+    val headerAlpha by remember(collapseRangePx) {
+        derivedStateOf {
+            if (listState.firstVisibleItemIndex > 0) {
+                0f
+            } else {
+                (1f - listState.firstVisibleItemScrollOffset / collapseRangePx)
+                    .coerceIn(0f, 1f)
+            }
+        }
+    }
 
     LazyColumn(
         state = listState,
@@ -141,7 +166,11 @@ fun HomeContent(
         contentPadding = PaddingValues(bottom = AzkrySpacing.Xl),
     ) {
         item(key = "sky-header") {
-            SkyHeaderSection(state = state, navigation = navigation)
+            SkyHeaderSection(
+                state = state,
+                navigation = navigation,
+                contentAlpha = { headerAlpha },
+            )
         }
 
         stickyHeader(key = "pinned-bar") {
@@ -178,23 +207,33 @@ fun HomeContent(
     }
 }
 
-/** The expanded sky header: actions, rotating verse, and the prayer strip. */
+/** Translucent band the prayer strip sits on, like the reference. */
+private val StripBand = Color(0x21C7D4FF)
+
+/**
+ * The expanded sky header: actions, rotating verse, and the prayer strip.
+ * [contentAlpha] fades the content (not the sky) as the list scrolls, so the
+ * header melts away gradually instead of jumping.
+ */
 @Composable
 private fun SkyHeaderSection(
     state: HomeUiState?,
     navigation: HomeNavigation,
+    contentAlpha: () -> Float,
 ) {
     val phase = state?.headerPhase ?: HeaderPhase.Night
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .sky(phase = phase, pageColor = AzkryTheme.colors.Slate900)
+            .graphicsLayer { alpha = contentAlpha() }
             .statusBarsPadding()
-            .padding(horizontal = AzkrySpacing.Md)
-            .padding(top = AzkrySpacing.Sm, bottom = AzkrySpacing.Md),
+            .padding(top = AzkrySpacing.Sm),
         verticalArrangement = Arrangement.spacedBy(AzkrySpacing.Lg),
     ) {
-        HeaderActionsRow(navigation = navigation, showLogo = false)
+        Box(modifier = Modifier.padding(horizontal = AzkrySpacing.Md)) {
+            HeaderActionsRow(navigation = navigation, showLogo = false, onSky = true)
+        }
 
         Text(
             text = state?.verse.orEmpty(),
@@ -203,11 +242,11 @@ private fun SkyHeaderSection(
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = AzkrySpacing.Md),
+                .padding(horizontal = AzkrySpacing.Md, vertical = AzkrySpacing.Md),
         )
 
         if (state != null) {
-            PrayerStrip(state)
+            PrayerStripBand(state)
         }
     }
 }
@@ -241,7 +280,7 @@ private fun PinnedBar(
                         .fillMaxWidth()
                         .padding(horizontal = AzkrySpacing.Md, vertical = AzkrySpacing.Sm),
                 ) {
-                    HeaderActionsRow(navigation = navigation, showLogo = true)
+                    HeaderActionsRow(navigation = navigation, showLogo = true, onSky = false)
                 }
             }
             HomeTabsRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
@@ -249,32 +288,32 @@ private fun PinnedBar(
     }
 }
 
+/** Indigo-ringed circles on the sky, like the reference header buttons. */
+private val SkyButtonFill = Color(0x59202A5C)
+private val SkyButtonRing = Color(0x805E6BB8)
+
 @Composable
 private fun HeaderActionsRow(
     navigation: HomeNavigation,
     showLogo: Boolean,
+    onSky: Boolean,
 ) {
+    val fill = if (onSky) SkyButtonFill else AzkryTheme.colors.SurfaceCard
+    val ring = if (onSky) SkyButtonRing else AzkryTheme.colors.BorderDefault
+    val tint = if (onSky) SkyText else AzkryTheme.colors.TextPrimary
+
     Box(modifier = Modifier.fillMaxWidth()) {
-        Row(
+        // Reading-start side (visual right in RTL): the lone play button,
+        // matching the reference layout exactly.
+        CircleIconButton(
+            icon = Icons.Outlined.PlayArrow,
+            contentDescription = stringResource(R.string.action_play),
+            onClick = navigation.onOpenMushaf,
             modifier = Modifier.align(Alignment.CenterStart),
-            horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
-        ) {
-            CircleIconButton(
-                icon = Icons.Outlined.Settings,
-                contentDescription = stringResource(R.string.action_settings),
-                onClick = navigation.onOpenSettings,
-            )
-            CircleIconButton(
-                icon = Icons.Outlined.Search,
-                contentDescription = stringResource(R.string.action_search),
-                onClick = navigation.onOpenSearch,
-            )
-            CircleIconButton(
-                icon = Icons.Outlined.Bookmark,
-                contentDescription = stringResource(R.string.action_bookmarks),
-                onClick = navigation.onOpenMushaf,
-            )
-        }
+            tint = tint,
+            containerColor = fill,
+            borderColor = ring,
+        )
 
         if (showLogo) {
             Text(
@@ -285,68 +324,158 @@ private fun HeaderActionsRow(
             )
         }
 
-        CircleIconButton(
-            icon = Icons.Outlined.PlayArrow,
-            contentDescription = stringResource(R.string.action_play),
-            onClick = navigation.onOpenMushaf,
+        // Opposite side (visual left): settings, search, bookmark reading
+        // left-to-right, as in the reference.
+        Row(
             modifier = Modifier.align(Alignment.CenterEnd),
-        )
+            horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
+        ) {
+            CircleIconButton(
+                icon = Icons.Outlined.Bookmark,
+                contentDescription = stringResource(R.string.action_bookmarks),
+                onClick = navigation.onOpenMushaf,
+                tint = tint,
+                containerColor = fill,
+                borderColor = ring,
+            )
+            CircleIconButton(
+                icon = Icons.Outlined.Search,
+                contentDescription = stringResource(R.string.action_search),
+                onClick = navigation.onOpenSearch,
+                tint = tint,
+                containerColor = fill,
+                borderColor = ring,
+            )
+            CircleIconButton(
+                icon = Icons.Outlined.Settings,
+                contentDescription = stringResource(R.string.action_settings),
+                onClick = navigation.onOpenSettings,
+                tint = tint,
+                containerColor = fill,
+                borderColor = ring,
+            )
+        }
     }
 }
 
-@Composable
-private fun PrayerStrip(state: HomeUiState) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        PrayerStripTime(
-            label = stringResource(state.previousPrayer.labelRes()),
-            time = state.previousTime,
-        )
+/** The pill rises this much above the band's top edge, into the sky. */
+private val ChipOverflowTop = 22.dp
 
-        // Two-line hijri chip (day above month), matching the design.
-        Surface(
-            shape = RoundedCornerShape(AzkryRadius.Md),
-            color = Color(0x33101828),
-            contentColor = SkyText,
-            border = BorderStroke(1.dp, Color(0x2EFFFFFF)),
+/** The pill sinks this much past the bottom edge — clipped, tucked under. */
+private val ChipTuckBottom = 10.dp
+
+private val ChipCorner = 18.dp
+
+/**
+ * The prayer strip as in the reference: a lighter full-width panel whose top
+ * line runs behind the taller hijri pill; the pill is the SAME fill as the
+ * panel — both are drawn as one path so the overlap is seamless — and its
+ * bottom is clipped, tucked under the tabs bar below. Prayer name and time
+ * are both bold white, centered on the panel.
+ */
+@Composable
+private fun PrayerStripBand(state: HomeUiState) {
+    val density = LocalDensity.current
+    val bandTopPx = with(density) { ChipOverflowTop.toPx() }
+    val chipCornerPx = with(density) { ChipCorner.toPx() }
+    var containerCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var chipRect by remember { mutableStateOf<Rect?>(null) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clipToBounds()
+            .onGloballyPositioned { containerCoords = it }
+            .drawBehind {
+                // One fill for panel + pill: overlap stays uniform, so the
+                // pill reads as part of the panel rather than a box on it.
+                val path = Path().apply {
+                    addRect(Rect(0f, bandTopPx, size.width, size.height))
+                    chipRect?.let { rect ->
+                        addRoundRect(
+                            RoundRect(rect, CornerRadius(chipCornerPx, chipCornerPx)),
+                        )
+                    }
+                }
+                drawPath(path, StripBand)
+            },
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AzkrySpacing.Md),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier.padding(
-                    horizontal = AzkrySpacing.S20,
-                    vertical = AzkrySpacing.Xs,
-                ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = state.hijriDay.toString(),
-                    style = AzkryTextStyles.Headline,
-                )
-                Text(
-                    text = state.hijriDayMonth,
-                    style = AzkryTextStyles.Caption,
-                    color = SkyTextSecondary,
-                )
-            }
+            PrayerStripTime(
+                label = stringResource(state.previousPrayer.labelRes()),
+                time = state.previousTime,
+                modifier = Modifier.padding(top = ChipOverflowTop),
+            )
+
+            HijriChip(
+                state = state,
+                modifier = Modifier
+                    .offset(y = ChipTuckBottom)
+                    .onGloballyPositioned { coords ->
+                        chipRect = containerCoords?.localBoundingBoxOf(coords, false)
+                    },
+            )
+
+            PrayerStripTime(
+                label = stringResource(state.upcomingPrayer.labelRes()),
+                time = state.upcomingTime,
+                modifier = Modifier.padding(top = ChipOverflowTop),
+            )
         }
 
-        PrayerStripTime(
-            label = stringResource(state.upcomingPrayer.labelRes()),
-            time = state.upcomingTime,
+        HorizontalDivider(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            thickness = 1.dp,
+            color = Color(0x2EFFFFFF),
+        )
+    }
+}
+
+/**
+ * Two-line hijri pill (day above month). Outline only — its fill is drawn
+ * by [PrayerStripBand] as one shape with the panel.
+ */
+@Composable
+private fun HijriChip(state: HomeUiState, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .border(1.dp, Color(0x47FFFFFF), RoundedCornerShape(ChipCorner))
+            .padding(horizontal = AzkrySpacing.S20, vertical = AzkrySpacing.S12),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = state.hijriDay.toString(),
+            style = AzkryTextStyles.Title2,
+            color = SkyText,
+        )
+        Text(
+            text = state.hijriDayMonth,
+            style = AzkryTextStyles.Subhead,
+            color = SkyTextSecondary,
         )
     }
 }
 
 @Composable
-private fun PrayerStripTime(label: String, time: String) {
+private fun PrayerStripTime(
+    label: String,
+    time: String,
+    modifier: Modifier = Modifier,
+) {
+    // Name and time are equally bold and white in the reference.
     Row(
+        modifier = modifier.padding(vertical = AzkrySpacing.S12),
         horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = label, style = AzkryTextStyles.Headline, color = SkyText)
-        Text(text = time, style = AzkryTextStyles.Headline, color = SkyTextSecondary)
+        Text(text = label, style = AzkryTextStyles.Title2, color = SkyText)
+        Text(text = time, style = AzkryTextStyles.Title2, color = SkyText)
     }
 }
 
@@ -378,6 +507,8 @@ private fun HomeTabsRow(
 
 @Composable
 private fun AdhanCountdownRow(state: HomeUiState) {
+    // Reference layout: yellow accent bar + white phrase on the reading-start
+    // side ("أذان العشاء بعد 4 دقائق"), gray precise ticker opposite ("3:08").
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -392,12 +523,18 @@ private fun AdhanCountdownRow(state: HomeUiState) {
         )
         Text(
             text = stringResource(
-                R.string.countdown_line,
+                R.string.adhan_countdown_line,
                 stringResource(state.countdownPrayer.labelRes()),
-                state.countdown,
+                state.countdownPhrase,
             ),
             style = AzkryTextStyles.Headline,
-            color = AzkryTheme.colors.AccentYellow,
+            color = AzkryTheme.colors.TextPrimary,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = state.countdownClock,
+            style = AzkryTextStyles.Headline,
+            color = AzkryTheme.colors.TextSecondary,
         )
     }
 }
@@ -654,7 +791,8 @@ private fun HomeContentPreview() {
                 previousTime = "06:07",
                 upcomingPrayer = Prayer.Dhuhr,
                 upcomingTime = "01:45",
-                countdown = "1:14:42",
+                countdownPhrase = "ساعة و15 دقيقة",
+                countdownClock = "1:14:42",
                 countdownPrayer = Prayer.Dhuhr,
                 trackingPercent = 10,
                 isFriday = false,

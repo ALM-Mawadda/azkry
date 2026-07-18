@@ -39,7 +39,7 @@
     <string name="prayer_isha">العشاء</string>
 
     <!-- Adhan countdown -->
-    <string name="countdown_line">%1$s بعد  %2$s</string>
+    <string name="adhan_countdown_line">أذان %1$s بعد %2$s</string>
     <string name="adhan_now">حان الآن أذان %1$s</string>
 
     <!-- Worship tracking -->
