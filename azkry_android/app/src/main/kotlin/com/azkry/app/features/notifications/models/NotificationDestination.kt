@@ -1,26 +1,10 @@
 package com.azkry.app.features.notifications.models
 
-import android.content.Intent
+import com.azkry.app.app.NotificationDestination
 
-/** Where a tapped notification should land inside the app. */
-enum class NotificationDestination {
-    MorningAdhkar,
-    EveningAdhkar,
-    PrayerTimes,
-    ;
-
-    companion object {
-        const val EXTRA = "notificationDestination"
-
-        fun fromIntent(intent: Intent?): NotificationDestination? =
-            intent?.getStringExtra(EXTRA)?.let { name ->
-                entries.firstOrNull { it.name == name }
-            }
-
-        fun forKind(kind: ReminderKind): NotificationDestination = when (kind) {
-            ReminderKind.MorningAdhkar -> MorningAdhkar
-            ReminderKind.EveningAdhkar -> EveningAdhkar
-            else -> PrayerTimes
-        }
-    }
+/** Maps notification-domain kinds onto root-shell navigation destinations. */
+fun ReminderKind.notificationDestination(): NotificationDestination = when (this) {
+    ReminderKind.MorningAdhkar -> NotificationDestination.MorningAdhkar
+    ReminderKind.EveningAdhkar -> NotificationDestination.EveningAdhkar
+    else -> NotificationDestination.PrayerTimes
 }

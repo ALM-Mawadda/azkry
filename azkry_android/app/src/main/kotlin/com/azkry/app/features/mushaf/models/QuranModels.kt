@@ -75,10 +75,3 @@ data class Khatmah(
         const val TOTAL_PAGES = 604
     }
 }
-
-private const val ARABIC_INDIC_DIGITS = "٠١٢٣٤٥٦٧٨٩"
-
-fun Int.toArabicIndicDigits(): String =
-    toString().map { ch ->
-        if (ch.isDigit()) ARABIC_INDIC_DIGITS[ch - '0'] else ch
-    }.joinToString("")

@@ -25,6 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.azkry.app.R
@@ -149,6 +152,7 @@ fun DhikrCard(
 
                 DhikrCounterBadge(
                     item = item,
+                    onTap = onTap,
                     onLongPress = onCounterLongPress,
                 )
             }
@@ -159,12 +163,28 @@ fun DhikrCard(
 @Composable
 private fun DhikrCounterBadge(
     item: DhikrCounterItem,
+    onTap: () -> Unit,
     onLongPress: () -> Unit,
 ) {
+    val incrementLabel = stringResource(R.string.action_increment_dhikr_counter)
+    val resetLabel = stringResource(R.string.action_reset_dhikr_counter)
     Surface(
         modifier = Modifier
             .size(48.dp)
-            .combinedClickable(onClick = {}, onLongClick = onLongPress),
+            .semantics {
+                customActions = listOf(
+                    CustomAccessibilityAction(resetLabel) {
+                        onLongPress()
+                        true
+                    },
+                )
+            }
+            .combinedClickable(
+                onClickLabel = incrementLabel,
+                onLongClickLabel = resetLabel,
+                onClick = onTap,
+                onLongClick = onLongPress,
+            ),
         shape = CircleShape,
         color = if (item.isComplete) AzkryTheme.colors.AccentGreen else AzkryTheme.colors.SurfaceCardStrong,
         contentColor = if (item.isComplete) AzkryTheme.colors.Night900 else AzkryTheme.colors.TextPrimary,

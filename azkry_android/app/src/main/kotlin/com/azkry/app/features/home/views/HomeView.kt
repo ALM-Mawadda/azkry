@@ -27,12 +27,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
@@ -64,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -404,14 +408,21 @@ private fun PrayerStripBand(state: HomeUiState) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = AzkrySpacing.Md),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            PrayerStripTime(
-                label = stringResource(state.previousPrayer.labelRes()),
-                time = state.previousTime,
-                modifier = Modifier.padding(top = ChipOverflowTop),
-            )
+            // Equal-weight side columns keep the pill dead-centre no matter how
+            // wide either prayer label is — the text adapts, the pill never moves.
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = ChipOverflowTop),
+                contentAlignment = Alignment.Center,
+            ) {
+                PrayerStripTime(
+                    label = stringResource(state.previousPrayer.labelRes()),
+                    time = state.previousTime,
+                )
+            }
 
             HijriChip(
                 state = state,
@@ -422,11 +433,17 @@ private fun PrayerStripBand(state: HomeUiState) {
                     },
             )
 
-            PrayerStripTime(
-                label = stringResource(state.upcomingPrayer.labelRes()),
-                time = state.upcomingTime,
-                modifier = Modifier.padding(top = ChipOverflowTop),
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = ChipOverflowTop),
+                contentAlignment = Alignment.Center,
+            ) {
+                PrayerStripTime(
+                    label = stringResource(state.upcomingPrayer.labelRes()),
+                    time = state.upcomingTime,
+                )
+            }
         }
 
         HorizontalDivider(
@@ -487,20 +504,33 @@ private fun HomeTabsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .selectableGroup()
             .padding(horizontal = AzkrySpacing.Md, vertical = AzkrySpacing.S12),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         HomeTab.entries.forEach { tab ->
-            Text(
-                text = stringResource(tab.titleRes),
-                style = AzkryTextStyles.Headline,
-                color = if (tab == selectedTab) {
-                    AzkryTheme.colors.TextPrimary
-                } else {
-                    AzkryTheme.colors.TextSecondary
-                },
-                modifier = Modifier.clickable { onTabSelected(tab) },
-            )
+            val isSelected = tab == selectedTab
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp)
+                    .selectable(
+                        selected = isSelected,
+                        role = Role.Tab,
+                        onClick = { onTabSelected(tab) },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = stringResource(tab.titleRes),
+                    style = AzkryTextStyles.Headline,
+                    color = if (isSelected) {
+                        AzkryTheme.colors.TextPrimary
+                    } else {
+                        AzkryTheme.colors.TextSecondary
+                    },
+                )
+            }
         }
     }
 }

@@ -5,6 +5,8 @@ import com.azkry.app.core.models.Dhikr
 import com.azkry.app.core.models.DhikrCategory
 import com.azkry.app.core.models.DhikrDailyCount
 import com.azkry.app.core.preview.Samples
+import com.azkry.app.core.utilities.CurrentDateProvider
+import java.time.LocalDate
 import com.azkry.app.features.adhkar.services.AdhkarService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,12 +29,17 @@ import org.junit.Test
 class DhikrReaderViewModelTest {
     private lateinit var service: FakeAdhkarService
     private lateinit var viewModel: DhikrReaderViewModel
+    private lateinit var currentDate: MutableStateFlow<LocalDate>
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         service = FakeAdhkarService()
-        viewModel = DhikrReaderViewModel(service)
+        currentDate = MutableStateFlow(LocalDate.of(2026, 7, 19))
+        viewModel = DhikrReaderViewModel(
+            service,
+            CurrentDateProvider.forTest(currentDate),
+        )
     }
 
     @After
@@ -106,6 +113,25 @@ class DhikrReaderViewModelTest {
         }
     }
 
+    @Test
+    fun `reader switches to fresh counters when the local date changes`() = runTest {
+        viewModel.start(Samples.morningCategory.id)
+
+        viewModel.state.test {
+            val loaded = awaitItemMatching { !it.isLoading }
+            val ayah = loaded.items.first { it.dhikr.id == Samples.ayatAlKursi.id }
+            viewModel.onDhikrTapped(ayah)
+            awaitItemMatching { state ->
+                state.items.first { it.dhikr.id == ayah.dhikr.id }.count == 1
+            }
+
+            currentDate.value = currentDate.value.plusDays(1)
+            awaitItemMatching { state ->
+                state.items.first { it.dhikr.id == ayah.dhikr.id }.count == 0
+            }
+        }
+    }
+
     private suspend fun app.cash.turbine.TurbineTestContext<DhikrReaderUiState>.awaitItemMatching(
         predicate: (DhikrReaderUiState) -> Boolean,
     ): DhikrReaderUiState {
@@ -117,7 +143,7 @@ class DhikrReaderViewModelTest {
 }
 
 private class FakeAdhkarService : AdhkarService {
-    private val counts = MutableStateFlow<Map<Long, Int>>(emptyMap())
+    private val counts = MutableStateFlow<Map<Pair<String, Long>, Int>>(emptyMap())
 
     override fun observeCategories(): Flow<List<DhikrCategory>> = flowOf(Samples.categories)
 
@@ -129,23 +155,25 @@ private class FakeAdhkarService : AdhkarService {
 
     override fun observeDailyCounts(categoryId: Long, date: String): Flow<List<DhikrDailyCount>> =
         counts.map { byId ->
-            byId.map { (dhikrId, count) ->
+            byId.filterKeys { (countDate, _) -> countDate == date }.map { (key, count) ->
+                val (_, dhikrId) = key
                 DhikrDailyCount(date = date, dhikrId = dhikrId, count = count)
             }
         }
 
     override suspend fun incrementCount(dhikr: Dhikr, date: String) {
-        val current = counts.value[dhikr.id] ?: 0
+        val key = date to dhikr.id
+        val current = counts.value[key] ?: 0
         if (current >= dhikr.repeatCount) return
-        counts.value = counts.value + (dhikr.id to current + 1)
+        counts.value = counts.value + (key to current + 1)
     }
 
     override suspend fun resetCount(dhikrId: Long, date: String) {
-        counts.value = counts.value - dhikrId
+        counts.value = counts.value - (date to dhikrId)
     }
 
     override suspend fun completeAll(adhkar: List<Dhikr>, date: String) {
-        counts.value = counts.value + adhkar.associate { it.id to it.repeatCount }
+        counts.value = counts.value + adhkar.associate { (date to it.id) to it.repeatCount }
     }
 
     override fun observeFavorites(): Flow<List<Dhikr>> =
@@ -155,7 +183,8 @@ private class FakeAdhkarService : AdhkarService {
 
     override fun observeAllDailyCounts(date: String): Flow<List<DhikrDailyCount>> =
         counts.map { byId ->
-            byId.map { (dhikrId, count) ->
+            byId.filterKeys { (countDate, _) -> countDate == date }.map { (key, count) ->
+                val (_, dhikrId) = key
                 DhikrDailyCount(date = date, dhikrId = dhikrId, count = count)
             }
         }

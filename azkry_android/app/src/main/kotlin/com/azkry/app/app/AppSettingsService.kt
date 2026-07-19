@@ -12,7 +12,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 data class AppSettings(
@@ -82,14 +81,6 @@ class DataStoreAppSettingsService @Inject constructor(
             preferences[AppStateKeys.HijriOffsetDays] = offsetDays.coerceIn(-2, 2).toString()
         }
     }
-}
-
-object EmptyAppSettingsService : AppSettingsService {
-    override val settings: Flow<AppSettings> = flowOf(AppSettings())
-
-    override suspend fun setLanguage(language: AppLanguage) = Unit
-    override suspend fun setAppearance(appearance: Appearance) = Unit
-    override suspend fun setHijriOffsetDays(offsetDays: Int) = Unit
 }
 
 private val Context.appSettingsDataStore: DataStore<Preferences> by preferencesDataStore(

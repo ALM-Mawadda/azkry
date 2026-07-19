@@ -1,4 +1,4 @@
-package com.azkry.app.core.notifications
+package com.azkry.app.features.notifications.services
 
 import android.app.AlarmManager
 import android.app.PendingIntent

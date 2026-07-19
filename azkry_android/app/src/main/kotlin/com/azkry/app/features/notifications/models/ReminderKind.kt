@@ -8,14 +8,17 @@ import com.azkry.app.core.models.Prayer
  * Everything the app can notify about. Adhan kinds fire at the prayer time;
  * the adhkar reminders are anchored to Fajr and Asr with a fixed offset.
  */
-enum class ReminderKind(val prayer: Prayer?) {
-    FajrAdhan(Prayer.Fajr),
-    DhuhrAdhan(Prayer.Dhuhr),
-    AsrAdhan(Prayer.Asr),
-    MaghribAdhan(Prayer.Maghrib),
-    IshaAdhan(Prayer.Isha),
-    MorningAdhkar(null),
-    EveningAdhkar(null),
+enum class ReminderKind(
+    val key: String,
+    val prayer: Prayer?,
+) {
+    FajrAdhan("FajrAdhan", Prayer.Fajr),
+    DhuhrAdhan("DhuhrAdhan", Prayer.Dhuhr),
+    AsrAdhan("AsrAdhan", Prayer.Asr),
+    MaghribAdhan("MaghribAdhan", Prayer.Maghrib),
+    IshaAdhan("IshaAdhan", Prayer.Isha),
+    MorningAdhkar("MorningAdhkar", null),
+    EveningAdhkar("EveningAdhkar", null),
     ;
 
     val isAdhan: Boolean get() = prayer != null
@@ -24,7 +27,7 @@ enum class ReminderKind(val prayer: Prayer?) {
         val adhanKinds: List<ReminderKind> = entries.filter { it.isAdhan }
 
         fun fromName(name: String?): ReminderKind? =
-            entries.firstOrNull { it.name == name }
+            entries.firstOrNull { it.key == name }
     }
 }
 

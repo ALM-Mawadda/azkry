@@ -3,9 +3,9 @@ package com.azkry.app.features.calendar.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.azkry.app.app.AppSettingsService
+import com.azkry.app.core.utilities.CurrentDateProvider
 import com.azkry.app.features.calendar.models.HijriMonth
 import com.azkry.app.features.calendar.models.HijriMonthGrid
-import java.time.LocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,14 +20,19 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HijriCalendarViewModel @Inject constructor(
     private val appSettingsService: AppSettingsService,
+    currentDateProvider: CurrentDateProvider,
 ) : ViewModel() {
     private val monthOffset = MutableStateFlow(0L)
 
     val month: StateFlow<HijriMonth?> =
-        combine(monthOffset, appSettingsService.settings) { offset, appSettings ->
+        combine(
+            monthOffset,
+            appSettingsService.settings,
+            currentDateProvider.observeCurrentDate(),
+        ) { offset, appSettings, currentDate ->
             HijriMonthGrid.monthAtOffset(
                 monthOffset = offset,
-                today = LocalDate.now().plusDays(appSettings.hijriOffsetDays.toLong()),
+                today = currentDate.plusDays(appSettings.hijriOffsetDays.toLong()),
             )
         }.stateIn(
             scope = viewModelScope,

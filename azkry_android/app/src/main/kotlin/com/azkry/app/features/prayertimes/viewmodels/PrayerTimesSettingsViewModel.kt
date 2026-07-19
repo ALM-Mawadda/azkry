@@ -11,6 +11,7 @@ import com.azkry.app.features.prayertimes.services.LocationService
 import com.azkry.app.features.prayertimes.services.PrayerSettings
 import com.azkry.app.features.prayertimes.services.PrayerSettingsService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.ZoneId
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,12 +51,18 @@ class PrayerTimesSettingsViewModel @Inject constructor(
         applySetting { settingsService.setHighLatitudeRule(rule) }
     }
 
-    fun onManualLocationEntered(cityName: String, latitude: Double, longitude: Double) {
+    fun onManualLocationEntered(
+        cityName: String,
+        latitude: Double,
+        longitude: Double,
+        zoneId: ZoneId,
+    ) {
         applySetting {
             settingsService.setAutoLocate(false)
             settingsService.setLocation(
                 cityName = cityName,
                 location = GeoLocation(latitude = latitude, longitude = longitude),
+                zoneId = zoneId,
             )
         }
     }

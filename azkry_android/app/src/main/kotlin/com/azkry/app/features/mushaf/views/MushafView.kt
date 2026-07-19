@@ -5,10 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -17,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
@@ -27,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -34,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.azkry.app.R
 import com.azkry.app.core.components.CenteredProgress
 import com.azkry.app.core.components.ScreenHeader
+import com.azkry.app.core.components.SelectablePill
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
 import com.azkry.app.core.theme.AzkryFonts
@@ -84,6 +91,10 @@ fun MushafContent(
     onStartKhatmah: (Int) -> Unit,
     onFinishKhatmah: () -> Unit,
 ) {
+    val navigationBarPadding = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     // Matches the design's darker Quran screens.
     Column(
         modifier = Modifier
@@ -103,11 +114,11 @@ fun MushafContent(
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            contentPadding = PaddingValues(
                 start = AzkrySpacing.Md,
                 end = AzkrySpacing.Md,
                 top = AzkrySpacing.Sm,
-                bottom = AzkrySpacing.Xl,
+                bottom = AzkrySpacing.Xl + navigationBarPadding,
             ),
             horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.S12),
             verticalArrangement = Arrangement.spacedBy(AzkrySpacing.S12),
@@ -369,48 +380,39 @@ private fun MushafTabsRow(
     selected: MushafTab,
     onTabSelected: (MushafTab) -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm)) {
-        MushafTabChip(
-            label = stringResource(R.string.mushaf_tab_surahs),
-            isSelected = selected == MushafTab.Surahs,
-            onClick = { onTabSelected(MushafTab.Surahs) },
-        )
-        MushafTabChip(
-            label = stringResource(R.string.mushaf_tab_juzs),
-            isSelected = selected == MushafTab.Juzs,
-            onClick = { onTabSelected(MushafTab.Juzs) },
-        )
-        MushafTabChip(
-            label = stringResource(R.string.mushaf_tab_pages),
-            isSelected = selected == MushafTab.Pages,
-            onClick = { onTabSelected(MushafTab.Pages) },
-        )
-    }
-}
-
-@Composable
-private fun MushafTabChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(AzkryRadius.Pill),
-        color = if (isSelected) AzkryTheme.colors.SurfaceCardStrong else AzkryTheme.colors.SurfaceCard,
-        contentColor = if (isSelected) AzkryTheme.colors.TextPrimary else AzkryTheme.colors.TextSecondary,
-        border = BorderStroke(
-            1.dp,
-            if (isSelected) AzkryTheme.colors.AccentYellow else AzkryTheme.colors.BorderDefault,
-        ),
+    Row(
+        modifier = Modifier.selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
     ) {
-        Text(
-            text = label,
-            style = AzkryTextStyles.Callout,
-            modifier = Modifier.padding(
+        SelectablePill(
+            label = stringResource(R.string.mushaf_tab_surahs),
+            selected = selected == MushafTab.Surahs,
+            onClick = { onTabSelected(MushafTab.Surahs) },
+            contentPadding = PaddingValues(
                 horizontal = AzkrySpacing.S20,
                 vertical = AzkrySpacing.Sm,
             ),
+            role = Role.Tab,
+        )
+        SelectablePill(
+            label = stringResource(R.string.mushaf_tab_juzs),
+            selected = selected == MushafTab.Juzs,
+            onClick = { onTabSelected(MushafTab.Juzs) },
+            contentPadding = PaddingValues(
+                horizontal = AzkrySpacing.S20,
+                vertical = AzkrySpacing.Sm,
+            ),
+            role = Role.Tab,
+        )
+        SelectablePill(
+            label = stringResource(R.string.mushaf_tab_pages),
+            selected = selected == MushafTab.Pages,
+            onClick = { onTabSelected(MushafTab.Pages) },
+            contentPadding = PaddingValues(
+                horizontal = AzkrySpacing.S20,
+                vertical = AzkrySpacing.Sm,
+            ),
+            role = Role.Tab,
         )
     }
 }

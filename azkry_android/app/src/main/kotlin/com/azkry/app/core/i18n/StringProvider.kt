@@ -19,10 +19,6 @@ class AndroidStringProvider @Inject constructor(
         context.getString(resId, *formatArgs)
 }
 
-object EmptyStringProvider : StringProvider {
-    override fun get(resId: Int, vararg formatArgs: Any): String = ""
-}
-
 /**
  * Resolves a throwable to a message safe to show the user.
  *

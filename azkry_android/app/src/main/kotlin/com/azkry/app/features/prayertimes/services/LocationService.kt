@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat
 import com.azkry.app.core.prayertimes.GeoLocation
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
@@ -42,11 +44,14 @@ class FusedLocationService @Inject constructor(
     override suspend fun currentLocation(): ResolvedLocation? {
         if (!hasPermission) return null
         val client = LocationServices.getFusedLocationProviderClient(context)
-        val fix = suspendCancellableCoroutine<android.location.Location?> { continuation ->
+        val fix = awaitCurrentLocation { cancellationToken, complete ->
             @Suppress("MissingPermission")
-            client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
-                .addOnSuccessListener { location -> continuation.resume(location) }
-                .addOnFailureListener { continuation.resume(null) }
+            client.getCurrentLocation(
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                cancellationToken,
+            )
+                .addOnSuccessListener { location -> complete(location) }
+                .addOnFailureListener { complete(null) }
         } ?: return null
 
         val geo = GeoLocation(latitude = fix.latitude, longitude = fix.longitude)
@@ -65,6 +70,20 @@ class FusedLocationService @Inject constructor(
                 val address = geocoder.getFromLocation(location.latitude, location.longitude, 1)
                 address?.firstOrNull()?.let { it.locality ?: it.subAdminArea ?: it.adminArea }
             }.getOrNull()
+        }
+    }
+}
+
+internal suspend fun awaitCurrentLocation(
+    request: (CancellationToken, (android.location.Location?) -> Unit) -> Unit,
+): android.location.Location? {
+    val cancellationSource = CancellationTokenSource()
+    return suspendCancellableCoroutine { continuation ->
+        continuation.invokeOnCancellation { cancellationSource.cancel() }
+        if (!continuation.isActive) return@suspendCancellableCoroutine
+
+        request(cancellationSource.token) { location ->
+            continuation.resume(location)
         }
     }
 }

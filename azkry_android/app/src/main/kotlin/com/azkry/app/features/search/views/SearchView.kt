@@ -5,12 +5,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
@@ -22,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,7 +75,17 @@ fun SearchContent(
     onOpenDhikrCategory: (Long) -> Unit,
     onOpenSurah: (Int) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val navigationBarPadding = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+    ) {
         ScreenHeader(
             title = stringResource(R.string.search_title),
             onBack = onBack,
@@ -87,6 +104,12 @@ fun SearchContent(
             singleLine = true,
             shape = RoundedCornerShape(AzkryRadius.Lg),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                },
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = AzkryTheme.colors.AccentYellow,
                 unfocusedBorderColor = AzkryTheme.colors.BorderDefault,
@@ -99,7 +122,7 @@ fun SearchContent(
                 start = AzkrySpacing.Md,
                 end = AzkrySpacing.Md,
                 top = AzkrySpacing.Md,
-                bottom = AzkrySpacing.Xl,
+                bottom = AzkrySpacing.Xl + navigationBarPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
         ) {

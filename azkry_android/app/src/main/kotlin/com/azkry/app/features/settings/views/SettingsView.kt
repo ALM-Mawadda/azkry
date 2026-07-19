@@ -5,12 +5,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -21,12 +19,9 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WorkspacePremium
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +40,7 @@ import com.azkry.app.app.AppSettingsViewModel
 import com.azkry.app.app.Appearance
 import com.azkry.app.core.components.ScreenHeader
 import com.azkry.app.core.components.SectionRowCard
+import com.azkry.app.core.components.RadioPickerDialog
 import com.azkry.app.core.theme.AzkrySpacing
 import com.azkry.app.core.theme.AzkryTextStyles
 import com.azkry.app.core.theme.AzkryTheme
@@ -166,7 +162,9 @@ fun SettingsView(
     }
 
     if (appearanceDialogOpen) {
-        AppearanceDialog(
+        RadioPickerDialog(
+            title = stringResource(R.string.settings_appearance),
+            options = Appearance.entries.map { it to stringResource(it.labelRes()) },
             selected = appearance,
             onSelected = { chosen ->
                 appSettingsViewModel.onAppearanceSelected(chosen)
@@ -175,57 +173,6 @@ fun SettingsView(
             onDismiss = { appearanceDialogOpen = false },
         )
     }
-}
-
-@Composable
-private fun AppearanceDialog(
-    selected: Appearance,
-    onSelected: (Appearance) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AzkryTheme.colors.SurfaceSheet,
-        titleContentColor = AzkryTheme.colors.TextPrimary,
-        textContentColor = AzkryTheme.colors.TextPrimary,
-        title = {
-            Text(
-                text = stringResource(R.string.settings_appearance),
-                style = AzkryTextStyles.Title3,
-            )
-        },
-        text = {
-            Column {
-                Appearance.entries.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = option == selected,
-                                onClick = { onSelected(option) },
-                            )
-                            .padding(vertical = AzkrySpacing.Xs),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
-                    ) {
-                        RadioButton(
-                            selected = option == selected,
-                            onClick = { onSelected(option) },
-                        )
-                        Text(
-                            text = stringResource(option.labelRes()),
-                            style = AzkryTextStyles.Body,
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.action_close))
-            }
-        },
-    )
 }
 
 private fun Appearance.labelRes(): Int = when (this) {

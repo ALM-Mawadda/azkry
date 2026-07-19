@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +33,7 @@ import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
 import com.azkry.app.core.theme.AzkryTextStyles
 import com.azkry.app.core.theme.AzkryTheme
-import com.azkry.app.features.mushaf.models.toArabicIndicDigits
+import com.azkry.app.core.utilities.toArabicIndicDigits
 import com.azkry.app.features.pages.models.AzkryPage
 import com.azkry.app.features.pages.models.PageKey
 import com.azkry.app.features.pages.models.PageSection
@@ -67,6 +70,10 @@ fun PageDetailContent(
     onBack: () -> Unit,
     onShare: (PageSection) -> Unit,
 ) {
+    val navigationBarPadding = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     Column(modifier = Modifier.fillMaxSize()) {
         ScreenHeader(title = page.title, onBack = onBack)
 
@@ -76,7 +83,7 @@ fun PageDetailContent(
                 start = AzkrySpacing.Md,
                 end = AzkrySpacing.Md,
                 top = AzkrySpacing.Sm,
-                bottom = AzkrySpacing.Xl,
+                bottom = AzkrySpacing.Xl + navigationBarPadding,
             ),
             verticalArrangement = Arrangement.spacedBy(AzkrySpacing.S12),
         ) {

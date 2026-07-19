@@ -24,8 +24,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.azkry.app.MainActivity
 import com.azkry.app.core.models.labelRes
-import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlinx.coroutines.flow.first
@@ -36,8 +35,8 @@ class NextPrayerWidget : GlanceAppWidget() {
         val entryPoint = WidgetEntryPoint.resolve(context)
         val prayerTimesService = entryPoint.prayerTimesService()
 
-        val now = LocalDateTime.now()
-        val dayTimes = prayerTimesService.observeTimes(LocalDate.now()).first()
+        val now = Instant.now()
+        val dayTimes = prayerTimesService.observeCurrentTimes(now).first()
         val next = prayerTimesService.nextPrayer(now, dayTimes)
         val timeFormatter = DateTimeFormatter.ofPattern("hh:mm", Locale.ENGLISH)
 

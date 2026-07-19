@@ -11,6 +11,9 @@ import com.azkry.app.features.mushaf.services.QuranService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -56,12 +59,17 @@ class SurahReaderViewModel @Inject constructor(
             initialValue = SurahReaderUiState(),
         )
 
-    private var startedSurah: Int? = null
+    private var activeRequest: ReaderRequest? = null
+    private var loadJob: Job? = null
 
     fun start(surahNumber: Int, startAyah: Int? = null, startPage: Int? = null) {
-        if (startedSurah == surahNumber) return
-        startedSurah = surahNumber
-        viewModelScope.launch {
+        val request = ReaderRequest(surahNumber, startAyah, startPage)
+        if (activeRequest == request) return
+
+        activeRequest = request
+        loadJob?.cancel()
+        internalState.value = SurahReaderUiState()
+        loadJob = viewModelScope.launch {
             val content = quranService.surah(surahNumber)
             val pages = content.ayahs
                 .groupBy { it.page }
@@ -77,6 +85,8 @@ class SurahReaderViewModel @Inject constructor(
 
                 else -> 0
             }
+            currentCoroutineContext().ensureActive()
+            if (activeRequest != request) return@launch
             internalState.update {
                 SurahReaderUiState(
                     surah = content,
@@ -125,4 +135,10 @@ class SurahReaderViewModel @Inject constructor(
             ),
         )
     }
+
+    private data class ReaderRequest(
+        val surahNumber: Int,
+        val startAyah: Int?,
+        val startPage: Int?,
+    )
 }

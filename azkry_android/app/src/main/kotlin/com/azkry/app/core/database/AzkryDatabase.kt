@@ -22,7 +22,7 @@ import com.azkry.app.core.models.WorshipLog
         FavoriteDhikr::class,
         SeedInfo::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class AzkryDatabase : RoomDatabase() {
@@ -58,6 +58,28 @@ abstract class AzkryDatabase : RoomDatabase() {
                         PRIMARY KEY(`id`)
                     )
                     """.trimIndent(),
+                )
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `adhkar` ADD COLUMN `stableKey` TEXT NOT NULL DEFAULT ''",
+                )
+                db.execSQL(
+                    """
+                    UPDATE `adhkar`
+                    SET `stableKey` = (
+                        SELECT c.`key` || '/item_' || (`adhkar`.`sortOrder` + 1)
+                        FROM `dhikr_categories` c
+                        WHERE c.`id` = `adhkar`.`categoryId`
+                    )
+                    """.trimIndent(),
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_adhkar_stableKey` " +
+                        "ON `adhkar` (`stableKey`)",
                 )
             }
         }

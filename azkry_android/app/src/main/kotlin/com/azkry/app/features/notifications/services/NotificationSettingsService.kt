@@ -60,9 +60,9 @@ class DataStoreNotificationSettingsService @Inject constructor(
         dataStore.edit { preferences ->
             val current = preferences[Keys.EnabledKinds].orEmpty()
             preferences[Keys.EnabledKinds] = if (enabled) {
-                current + kind.name
+                current + kind.key
             } else {
-                current - kind.name
+                current - kind.key
             }
         }
     }

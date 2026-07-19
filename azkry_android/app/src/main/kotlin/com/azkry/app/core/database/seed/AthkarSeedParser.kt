@@ -26,6 +26,8 @@ data class SeedDhikr(
     val source: String? = null,
     val title: String? = null,
     val virtue: String? = null,
+    /** Optional immutable item key. Existing keys must never be repurposed. */
+    val key: String? = null,
 )
 
 object AthkarSeedParser {

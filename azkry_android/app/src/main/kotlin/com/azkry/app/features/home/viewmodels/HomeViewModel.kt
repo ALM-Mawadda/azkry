@@ -13,12 +13,13 @@ import com.azkry.app.features.adhkar.services.AdhkarService
 import com.azkry.app.features.home.models.HeaderPhase
 import com.azkry.app.features.home.models.HomeDayView
 import com.azkry.app.features.mushaf.services.QuranService
+import com.azkry.app.features.prayertimes.services.PrayerSettingsService
 import com.azkry.app.features.prayertimes.services.PrayerTimesService
 import com.azkry.app.features.tracking.services.WorshipTrackingService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
@@ -74,6 +75,7 @@ class HomeViewModel @Inject constructor(
     prayerTimesService: PrayerTimesService,
     trackingService: WorshipTrackingService,
     appSettingsService: AppSettingsService,
+    prayerSettingsService: PrayerSettingsService,
     adhkarService: AdhkarService,
     quranService: QuranService,
 ) : ViewModel() {
@@ -84,15 +86,19 @@ class HomeViewModel @Inject constructor(
     // Seconds resolution: the countdown ticks like the reference app.
     private val ticker = flow {
         while (true) {
-            emit(LocalDateTime.now())
+            emit(Instant.now())
             delay(1_000)
         }
     }
 
-    private val dateFlow = ticker.map(LocalDateTime::toLocalDate).distinctUntilChanged()
+    private val localTicker = combine(ticker, prayerSettingsService.settings) { instant, settings ->
+        instant.atZone(settings.zoneId)
+    }
+
+    private val dateFlow = localTicker.map(ZonedDateTime::toLocalDate).distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val suggestedCategory = ticker
+    private val suggestedCategory = localTicker
         .map { now -> HomeDayView.suggestedAdhkarKey(phaseAt(now)) }
         .distinctUntilChanged()
         .map { key -> adhkarService.categoryByKey(key) }
@@ -102,7 +108,7 @@ class HomeViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<HomeUiState?> =
         combine(
-            ticker,
+            localTicker,
             dateFlow.flatMapLatest { date -> prayerTimesService.observeTimes(date) },
             dateFlow.flatMapLatest { date -> trackingService.observeDay(date.toDateKey()) },
             combine(hijriOffsetDays, suggestedCategory, quranService.bookmarks) { offset, category, bookmarks ->
@@ -110,9 +116,10 @@ class HomeViewModel @Inject constructor(
             },
         ) { now, dayTimes, dayTracking, (hijriOffset, category, bookmarkCount) ->
             latestTimes = dayTimes.times.times
-            val next = prayerTimesService.nextPrayer(now, dayTimes)
+            val next = prayerTimesService.nextPrayer(now.toInstant(), dayTimes)
             val (previous, upcoming) = HomeDayView.stripEvents(now.toLocalTime(), latestTimes)
-            val hijriDate = LocalDate.now().plusDays(hijriOffset.toLong())
+            val currentDate = now.toLocalDate()
+            val hijriDate = currentDate.plusDays(hijriOffset.toLong())
             HomeUiState(
                 verse = HEADER_VERSES[now.hour % HEADER_VERSES.size],
                 hijriDay = hijriDate.toHijriDay(),
@@ -127,7 +134,7 @@ class HomeViewModel @Inject constructor(
                 countdownClock = HomeDayView.countdownClock(next.remaining),
                 countdownPrayer = next.prayer,
                 trackingPercent = dayTracking.percent,
-                isFriday = LocalDate.now().dayOfWeek == DayOfWeek.FRIDAY,
+                isFriday = currentDate.dayOfWeek == DayOfWeek.FRIDAY,
                 suggestedCategory = category,
                 quranBookmarkCount = bookmarkCount,
             )
@@ -137,6 +144,6 @@ class HomeViewModel @Inject constructor(
             initialValue = null,
         )
 
-    private fun phaseAt(now: LocalDateTime): HeaderPhase =
+    private fun phaseAt(now: ZonedDateTime): HeaderPhase =
         HomeDayView.phaseFor(now.toLocalTime(), latestTimes)
 }

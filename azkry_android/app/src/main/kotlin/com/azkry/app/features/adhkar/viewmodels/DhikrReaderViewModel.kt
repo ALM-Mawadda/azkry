@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.azkry.app.core.models.Dhikr
 import com.azkry.app.core.models.DhikrCategory
+import com.azkry.app.core.utilities.CurrentDateProvider
 import com.azkry.app.core.utilities.toDateKey
 import com.azkry.app.features.adhkar.services.AdhkarService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,18 +43,19 @@ data class DhikrReaderUiState(
 @HiltViewModel
 class DhikrReaderViewModel @Inject constructor(
     private val adhkarService: AdhkarService,
+    private val currentDateProvider: CurrentDateProvider,
 ) : ViewModel() {
     private val categoryId = MutableStateFlow<Long?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<DhikrReaderUiState> =
-        categoryId
-            .flatMapLatest { id ->
+        combine(categoryId, currentDateProvider.observeCurrentDate()) { id, date -> id to date }
+            .flatMapLatest { (id, date) ->
                 if (id == null) return@flatMapLatest flowOf(DhikrReaderUiState())
-                val date = todayKey()
+                val dateKey = date.toDateKey()
                 combine(
                     adhkarService.observeAdhkar(id),
-                    adhkarService.observeDailyCounts(id, date),
+                    adhkarService.observeDailyCounts(id, dateKey),
                     adhkarService.observeFavoriteIds(),
                     categoryFlow(id),
                 ) { adhkar, counts, favoriteIds, category ->
@@ -111,5 +112,5 @@ class DhikrReaderViewModel @Inject constructor(
     private fun categoryFlow(id: Long) =
         kotlinx.coroutines.flow.flow { emit(adhkarService.categoryById(id)) }
 
-    private fun todayKey(): String = LocalDate.now().toDateKey()
+    private fun todayKey(): String = currentDateProvider.currentDate().toDateKey()
 }

@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -49,7 +52,7 @@ import com.azkry.app.core.theme.AzkryTextStyles
 import com.azkry.app.core.theme.QuranTextStyle
 import com.azkry.app.features.mushaf.models.QuranAyah
 import com.azkry.app.features.mushaf.models.SurahContent
-import com.azkry.app.features.mushaf.models.toArabicIndicDigits
+import com.azkry.app.core.utilities.toArabicIndicDigits
 import com.azkry.app.features.mushaf.viewmodels.ReaderPage
 import com.azkry.app.features.mushaf.viewmodels.SurahReaderUiState
 import com.azkry.app.features.mushaf.viewmodels.SurahReaderViewModel
@@ -65,7 +68,7 @@ fun SurahReaderView(
     onBack: () -> Unit,
     viewModel: SurahReaderViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(surahNumber) {
+    LaunchedEffect(surahNumber, startAyah, startPage) {
         viewModel.start(surahNumber, startAyah, startPage)
     }
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -84,6 +87,10 @@ fun SurahReaderContent(
     onPageViewed: (ReaderPage) -> Unit,
     onBookmarkToggled: () -> Unit,
 ) {
+    val navigationBarPadding = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     // The mushaf reads on a near-black backdrop, deliberately darker than
     // the slate app chrome (matching the design's Quran screens).
     Column(
@@ -122,6 +129,13 @@ fun SurahReaderContent(
             initialFirstVisibleItemIndex = (state.initialPageIndex + 1).coerceAtMost(state.pages.size),
         )
 
+        LaunchedEffect(listState, state.surah.number, state.initialPageIndex) {
+            val requestedItem = (state.initialPageIndex + 1).coerceAtMost(state.pages.size)
+            if (listState.firstVisibleItemIndex != requestedItem) {
+                listState.scrollToItem(requestedItem)
+            }
+        }
+
         LaunchedEffect(listState, state.pages) {
             snapshotFlow { listState.firstVisibleItemIndex }
                 .distinctUntilChanged()
@@ -136,7 +150,7 @@ fun SurahReaderContent(
             contentPadding = PaddingValues(
                 start = AzkrySpacing.Md,
                 end = AzkrySpacing.Md,
-                bottom = AzkrySpacing.Xl,
+                bottom = AzkrySpacing.Xl + navigationBarPadding,
             ),
         ) {
             item(key = "surah-header") {

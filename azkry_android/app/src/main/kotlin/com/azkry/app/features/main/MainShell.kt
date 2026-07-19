@@ -18,7 +18,7 @@ import com.azkry.app.features.home.views.HomeView
 import com.azkry.app.features.mushaf.views.MushafView
 import com.azkry.app.features.mushaf.views.SurahOpenRequest
 import com.azkry.app.features.mushaf.views.SurahReaderView
-import com.azkry.app.features.notifications.models.NotificationDestination
+import com.azkry.app.app.NotificationDestination
 import com.azkry.app.features.notifications.views.NotificationSettingsView
 import com.azkry.app.features.pages.models.PageKey
 import com.azkry.app.features.pages.views.PageDetailView

@@ -6,8 +6,8 @@ import com.azkry.app.core.models.DhikrCategoryKeys
 import com.azkry.app.core.models.Prayer
 import com.azkry.app.core.models.PrayerLog
 import com.azkry.app.core.models.WorshipLog
+import com.azkry.app.core.models.WorshipTask
 import com.azkry.app.features.tracking.models.WorshipScoring
-import com.azkry.app.features.tracking.models.WorshipTask
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,7 +104,7 @@ class RoomWorshipTrackingService @Inject constructor(
 
     override suspend fun setTaskCompleted(date: String, task: WorshipTask, completed: Boolean) {
         trackingDao.upsertWorshipLog(
-            WorshipLog(date = date, taskKey = task.name, completed = completed),
+            WorshipLog(date = date, taskKey = task.key, completed = completed),
         )
     }
 

@@ -79,6 +79,29 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun migrate3To4_addsStableDhikrIdentity() {
+        helper.createDatabase(TEST_DB, 3).apply {
+            execSQL(
+                "INSERT INTO dhikr_categories (id, `key`, title, iconKey, sortOrder) " +
+                    "VALUES (7, 'morning', 'أذكار الصباح', 'sun', 0)",
+            )
+            execSQL(
+                "INSERT INTO adhkar " +
+                    "(id, categoryId, text, repeatCount, source, sortOrder, title, virtue) " +
+                    "VALUES (42, 7, 'سبحان الله', 33, NULL, 2, NULL, NULL)",
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, AzkryDatabase.MIGRATION_3_4)
+
+        db.query("SELECT stableKey FROM adhkar WHERE id = 42").use { cursor ->
+            cursor.moveToFirst()
+            assertEquals("morning/item_3", cursor.getString(0))
+        }
+    }
+
     private companion object {
         const val TEST_DB = "migration-test.db"
     }

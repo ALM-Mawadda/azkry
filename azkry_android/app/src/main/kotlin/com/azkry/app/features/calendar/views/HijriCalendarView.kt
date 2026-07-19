@@ -90,7 +90,7 @@ fun HijriCalendarContent(
                 IconButton(onClick = onPreviousMonth) {
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowRight,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.action_previous_month),
                         tint = AzkryTheme.colors.TextSecondary,
                     )
                 }
@@ -103,7 +103,7 @@ fun HijriCalendarContent(
                 IconButton(onClick = onNextMonth) {
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowLeft,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.action_next_month),
                         tint = AzkryTheme.colors.TextSecondary,
                     )
                 }

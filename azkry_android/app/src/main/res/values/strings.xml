@@ -9,6 +9,12 @@
     <string name="action_bookmarks">المحفوظات</string>
     <string name="action_play">تشغيل</string>
     <string name="action_share">مشاركة</string>
+    <string name="action_previous_day">اليوم السابق</string>
+    <string name="action_next_day">اليوم التالي</string>
+    <string name="action_previous_month">الشهر السابق</string>
+    <string name="action_next_month">الشهر التالي</string>
+    <string name="action_reset_dhikr_counter">تصفير عدّاد الذكر</string>
+    <string name="action_increment_dhikr_counter">زيادة عدّاد الذكر</string>
     <string name="coming_soon">قريبًا</string>
     <string name="error_generic">حدث خطأ ما، حاول مرة أخرى</string>
 
@@ -103,6 +109,9 @@
     <!-- Prayer time settings -->
     <string name="prayer_settings_location">الموقع الجغرافي الحالي</string>
     <string name="prayer_settings_coordinates">خط الطول: %1$s — خط العرض: %2$s</string>
+    <string name="prayer_settings_location_details">%1$s · %2$s</string>
+    <string name="prayer_settings_timezone">المنطقة الزمنية</string>
+    <string name="prayer_settings_timezone_hint">مثال: Europe/Paris أو Asia/Riyadh</string>
     <string name="prayer_settings_method">طريقة الحساب</string>
     <string name="prayer_settings_asr">الحساب الفقهي لصلاة العصر</string>
     <string name="prayer_settings_highlat">خط العرض المرتفع</string>

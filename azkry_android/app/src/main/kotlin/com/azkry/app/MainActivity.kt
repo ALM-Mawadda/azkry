@@ -11,7 +11,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.azkry.app.app.AzkryRoot
-import com.azkry.app.features.notifications.models.NotificationDestination
+import com.azkry.app.app.NotificationDestination
 import com.azkry.app.features.notifications.services.ReminderScheduler
 import com.azkry.app.features.prayertimes.services.PrayerLocationRefresher
 import dagger.hilt.android.AndroidEntryPoint

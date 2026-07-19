@@ -32,6 +32,7 @@ object AdhkarSeed {
             .categories
 
         val all = imported + extraCategories
+        validate(all)
         dao.replaceSeededContent(
             categoriesWithItems = all.mapIndexed { index, category ->
                 DhikrCategory(
@@ -48,11 +49,29 @@ object AdhkarSeed {
                         sortOrder = itemIndex,
                         title = item.title,
                         virtue = item.virtue,
+                        stableKey = stableDhikrKey(category.key, item, itemIndex),
                     )
                 }
             },
             revision = CONTENT_REVISION,
         )
+    }
+
+    private fun validate(categories: List<SeedCategory>) {
+        require(categories.map { it.key }.distinct().size == categories.size) {
+            "Seed category keys must be unique"
+        }
+        val stableKeys = categories.flatMap { category ->
+            require(category.key.isNotBlank()) { "Seed category key must not be blank" }
+            category.items.mapIndexed { index, item ->
+                require(item.text.isNotBlank()) { "Seed dhikr text must not be blank" }
+                require(item.count > 0) { "Seed dhikr repeat count must be positive" }
+                stableDhikrKey(category.key, item, index)
+            }
+        }
+        require(stableKeys.distinct().size == stableKeys.size) {
+            "Seed dhikr stable keys must be unique"
+        }
     }
 
     private val tasbih = SeedCategory(
@@ -237,4 +256,15 @@ object AdhkarSeed {
         lovedOnes,
         kids,
     )
+}
+
+/**
+ * The positional fallback is part of the persisted backup contract. Existing
+ * fallback items must retain their position; use an explicit [SeedDhikr.key]
+ * before introducing a seed revision that would otherwise move them.
+ */
+internal fun stableDhikrKey(categoryKey: String, item: SeedDhikr, index: Int): String {
+    val itemKey = item.key ?: "item_${index + 1}"
+    require(itemKey.isNotBlank() && '/' !in itemKey) { "Invalid seed dhikr key: $itemKey" }
+    return "$categoryKey/$itemKey"
 }

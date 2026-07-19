@@ -34,7 +34,7 @@ app/src/main/kotlin/com/azkry/app/
     preview/                   # @AzkryPreview, AzkryPreviewSurface, Samples (fixtures only)
     theme/                     # colors, typography, spacing, radius, bundled fonts
                                # (Almarai = app-wide UI face; Amiri/Amiri Quran = religious text)
-    utilities/                 # tiny cross-feature helpers (date keys, hijri formatting)
+    utilities/                 # cross-feature date rollover, hijri formatting, Arabic digits
   features/
     main/                      # MainShell: state-driven root navigation
     home/{viewmodels,views}    # hub: verse header, prayer strip, functional tab strip
@@ -51,7 +51,7 @@ app/src/main/kotlin/com/azkry/app/
     calendar/{models,viewmodels,views}       # hijri month grid (Umm al-Qura chronology)
     notifications/{models,services,receivers,viewmodels,views}
                                # reminder planning, alarm chain, boot receiver, toggles UI
-    settings/{views}           # settings hub
+    settings/{services,viewmodels,views} # settings hub + versioned manual backup
 ```
 
 Bundled data: `app/src/main/assets/quran/` holds the full Uthmani Quran text
@@ -62,7 +62,9 @@ SIL OFL). `assets/adhkar/athkar_seed.json` is the main adhkar library
 app's database — regenerate it with tooling from that source, never edit the
 Arabic by hand. Quranic passages in `StaticPagesService` are copied verbatim
 from `assets/quran/` — never retype Quranic text by hand; regenerate it so
-the tashkeel stays authoritative. Adhkar seeding is revision-driven: bump
+the tashkeel stays authoritative. Adhkar seeding is revision-driven and
+guarded by `DatabaseReadiness`, so DAO consumers cannot observe a pre-seed
+empty database or silently outlive a seed failure. Bump
 `AdhkarSeed.CONTENT_REVISION` when bundled content changes, and know that a
 bump wipes and re-inserts all seeded categories (favorites and daily counts
 reset via FK cascade).
@@ -133,19 +135,22 @@ The folders above are the default target shape. Add feature-local `models/` only
 ## Data Contracts To Preserve
 
 - Daily records key on the **local ISO date string** (`LocalDate.toDateKey()`, `yyyy-MM-dd`). A new day starts every counter and log at zero implicitly — never add a midnight reset job.
+- Long-lived daily screens derive their key from `CurrentDateProvider`; do not capture `LocalDate.now()` once in a ViewModel.
 - Dhikr counters are capped at the dhikr's `repeatCount`; increments beyond it are no-ops.
 - A category counts as "completed" for tracking when every one of its adhkar reached its repeat count that day.
 - Day completion percentage uses `WorshipScoring` weights (prayers 50%, adhkar 10%, Quran 10%, rawatib 10%, daily 10%, other 10%). Change weights only there.
 - `Prayer.Sunrise` is not an obligatory prayer; use `Prayer.obligatory` for anything user-facing that counts prayers.
 - Schema changes require a Room migration plus a version bump in `AzkryDatabase`; exported schema JSON lives in `app/schemas/`.
+- `Dhikr.stableKey` is the backup identity and must survive reseeding. Never repurpose a released seed key; assign an explicit `SeedDhikr.key` before reordering an item whose positional fallback is already released.
 
 ## Android-Specific Rules
 
 - The default resource locale is Arabic (`res/values/strings.xml` is Arabic); `MissingTranslation` lint is disabled deliberately. The app forces the Arabic locale and RTL even on non-Arabic devices (`AppSettings.language` defaults to Arabic).
 - Directional chevrons/back arrows in shared components are deliberately **not** auto-mirrored: the design's forward chevron points left and its back chevron points right, matching this RTL-only app.
 - Activity-level theme parents must extend `Theme.AppCompat.*` (or `Theme.SplashScreen` which already does).
-- Backups are disabled (`allowBackup=false` and both extraction rule files exclude databases and prefs) — worship data is private by default. Revisit both files together if a backup feature is ever added.
+- Automatic OS backup/device transfer is disabled (`allowBackup=false`; extraction rules exclude databases, shared preferences, and DataStore). The separate SAF JSON backup is explicit, user-initiated, versioned, validated, and transactionally imported.
 - Runtime permissions in use: `POST_NOTIFICATIONS` (requested when the first reminder toggle is enabled) and `ACCESS_COARSE_LOCATION` (requested from the prayer-settings location dialog). Exact alarms use `USE_EXACT_ALARM` (33+) / `SCHEDULE_EXACT_ALARM` (31–32) — legitimate for an adhan app.
+- Prayer locations persist an IANA `ZoneId`. Calculation, next-prayer selection, widgets, and alarms use that configured zone end-to-end; do not convert prayer events with the device zone unless current-location mode explicitly selected it.
 
 ## Notifications
 
@@ -155,7 +160,8 @@ The folders above are the default target shape. Add feature-local `models/` only
 ## Build & Release
 
 - `release` build type runs R8 (`isMinifyEnabled = true` + `isShrinkResources = true`) with `proguard-rules.pro`. Keep rules cover Hilt, Kotlinx Serialization, Room, and coroutines.
-- Release signing reads `RELEASE_KEYSTORE_PATH`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` from `secrets.properties` (git-ignored). If unset, the release build falls back to debug signing for local builds; CI must supply them for store uploads.
+- Hilt and Room code generation use KSP. AGP built-in Kotlin is enabled; do not restore the legacy `org.jetbrains.kotlin.android`, kapt, or old-DSL compatibility switches.
+- Release signing reads `RELEASE_KEYSTORE_PATH`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` from `secrets.properties` (git-ignored). Release packaging fails when any credential is missing; release artifacts must never fall back to debug signing.
 
 ## Tests
 

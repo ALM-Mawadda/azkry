@@ -1,9 +1,9 @@
 package com.azkry.app.features.main
 
 import androidx.lifecycle.ViewModel
+import com.azkry.app.app.NotificationDestination
 import com.azkry.app.core.models.DhikrCategoryKeys
 import com.azkry.app.features.adhkar.services.AdhkarService
-import com.azkry.app.features.notifications.models.NotificationDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

@@ -1,5 +1,6 @@
 package com.azkry.app.core.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -19,7 +20,10 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE,
         ),
     ],
-    indices = [Index(value = ["categoryId"])],
+    indices = [
+        Index(value = ["categoryId"]),
+        Index(value = ["stableKey"], unique = true),
+    ],
 )
 data class Dhikr(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -32,4 +36,6 @@ data class Dhikr(
     val title: String? = null,
     /** Reported virtue/fadl of the dhikr, shown under the text. */
     val virtue: String? = null,
+    /** Stable seed identity used by backups; unlike [id], it survives reseeding. */
+    @ColumnInfo(defaultValue = "''") val stableKey: String = "",
 )

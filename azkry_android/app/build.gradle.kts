@@ -2,10 +2,9 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
@@ -59,10 +58,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = if (hasReleaseKeystore) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
             }
         }
         debug {
@@ -75,6 +72,11 @@ android {
         compose = true
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -83,7 +85,7 @@ android {
 
     sourceSets {
         // Exported Room schemas double as fixtures for the migration test.
-        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.directories += "$projectDir/schemas"
     }
 
     lint {
@@ -95,15 +97,25 @@ android {
     }
 }
 
-kotlin {
-    jvmToolchain(17)
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "true")
 }
 
-kapt {
-    correctErrorTypes = true
-    arguments {
-        arg("room.schemaLocation", "$projectDir/schemas")
-        arg("room.incremental", "true")
+val verifyReleaseSigning by tasks.registering {
+    group = "verification"
+    description = "Fails artifact packaging when the release signing credentials are unavailable."
+    doLast {
+        check(hasReleaseKeystore) {
+            "Release signing is not configured. Set all RELEASE_KEYSTORE_* and RELEASE_KEY_* " +
+                "values in secrets.properties, and ensure RELEASE_KEYSTORE_PATH exists."
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name == "packageRelease" || name == "bundleRelease") {
+        dependsOn(verifyReleaseSigning)
     }
 }
 
@@ -133,8 +145,8 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
 
-    kapt(libs.hilt.compiler)
-    kapt(libs.room.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.room.compiler)
 
     debugImplementation(libs.compose.ui.tooling)
 

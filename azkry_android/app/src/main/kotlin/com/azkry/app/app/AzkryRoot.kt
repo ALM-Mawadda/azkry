@@ -11,7 +11,6 @@ import com.azkry.app.core.i18n.AppLocale
 import com.azkry.app.core.i18n.ProvideAppLocale
 import com.azkry.app.core.theme.AzkryTheme
 import com.azkry.app.features.main.MainShell
-import com.azkry.app.features.notifications.models.NotificationDestination
 
 @Composable
 fun AzkryRoot(

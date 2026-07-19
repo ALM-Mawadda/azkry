@@ -11,18 +11,18 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.azkry.app.MainActivity
 import com.azkry.app.R
+import com.azkry.app.app.NotificationDestination
 import com.azkry.app.core.models.labelRes
-import com.azkry.app.core.notifications.AlarmScheduler
 import com.azkry.app.core.notifications.NotificationChannels
-import com.azkry.app.features.notifications.models.NotificationDestination
 import com.azkry.app.features.notifications.models.PlannedReminder
 import com.azkry.app.features.notifications.models.ReminderKind
 import com.azkry.app.features.notifications.models.ReminderPlanner
+import com.azkry.app.features.notifications.models.notificationDestination
 import com.azkry.app.features.notifications.receivers.ReminderAlarmReceiver
 import com.azkry.app.features.prayertimes.services.PrayerTimesService
 import com.azkry.app.features.widgets.AzkryWidgetUpdater
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.LocalDate
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -48,7 +48,7 @@ class ReminderScheduler @Inject constructor(
 ) {
     private val timeFormatter = DateTimeFormatter.ofPattern("hh:mm", Locale.ENGLISH)
 
-    suspend fun rescheduleNext(now: LocalDateTime = LocalDateTime.now()) {
+    suspend fun rescheduleNext(now: Instant = Instant.now()) {
         val settings = settingsService.settings.first()
         updateOngoingNotification(settings, now)
         widgetUpdater.updateAll()
@@ -58,7 +58,10 @@ class ReminderScheduler @Inject constructor(
             return
         }
 
-        val today = now.toLocalDate()
+        val currentDayTimes = prayerTimesService.observeCurrentTimes(now).first()
+        val zoneId = currentDayTimes.settings.zoneId
+        val localNow = LocalDateTime.ofInstant(now, zoneId)
+        val today = localNow.toLocalDate()
         val timesByDate = listOf(today, today.plusDays(1)).associateWith { date ->
             prayerTimesService.observeTimes(date).first().times.times
         }
@@ -67,13 +70,13 @@ class ReminderScheduler @Inject constructor(
         // every adhan so the countdown rolls over on time.
         val effectiveKinds = settings.enabledKinds.ifEmpty { ReminderKind.adhanKinds.toSet() }
         val next = ReminderPlanner.nextReminder(
-            now = now,
+            now = localNow,
             enabled = effectiveKinds,
             preAdhanEnabled = settings.preAdhanEnabled,
         ) { date -> timesByDate[date].orEmpty() }
 
         if (next != null) {
-            schedule(next)
+            schedule(next, zoneId)
         }
     }
 
@@ -86,14 +89,14 @@ class ReminderScheduler @Inject constructor(
         rescheduleNext()
     }
 
-    private fun schedule(reminder: PlannedReminder) {
+    private fun schedule(reminder: PlannedReminder, zoneId: ZoneId) {
         val triggerAtMillis = reminder.at
-            .atZone(ZoneId.systemDefault())
+            .atZone(zoneId)
             .toInstant()
             .toEpochMilli()
         alarmScheduler.scheduleExact(
             triggerAtMillis,
-            alarmPendingIntent(reminder.kind.name, reminder.isPreReminder),
+            alarmPendingIntent(reminder.kind.key, reminder.isPreReminder),
         )
     }
 
@@ -102,7 +105,7 @@ class ReminderScheduler @Inject constructor(
     @SuppressLint("MissingPermission")
     private suspend fun updateOngoingNotification(
         settings: NotificationSettings,
-        now: LocalDateTime,
+        now: Instant,
     ) {
         val manager = NotificationManagerCompat.from(context)
         if (!settings.nextPrayerOngoing || !hasPostPermission()) {
@@ -110,9 +113,9 @@ class ReminderScheduler @Inject constructor(
             return
         }
 
-        val dayTimes = prayerTimesService.observeTimes(now.toLocalDate()).first()
+        val dayTimes = prayerTimesService.observeCurrentTimes(now).first()
         val next = prayerTimesService.nextPrayer(now, dayTimes)
-        val atMillis = next.at.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val atMillis = next.at.toInstant().toEpochMilli()
 
         val notification = NotificationCompat.Builder(context, NotificationChannels.NEXT_PRAYER)
             .setSmallIcon(R.drawable.ic_notification)
@@ -140,13 +143,13 @@ class ReminderScheduler @Inject constructor(
     private suspend fun showNotification(kind: ReminderKind, isPre: Boolean) {
         if (!hasPostPermission()) return
 
-        val (channel, title, text) = notificationContent(kind, isPre)
+        val (channel, title, text) = notificationContent(kind, isPre, Instant.now())
         val notification = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)
-            .setContentIntent(contentIntent(NotificationDestination.forKind(kind)))
+            .setContentIntent(contentIntent(kind.notificationDestination()))
             .build()
 
         NotificationManagerCompat.from(context).notify(kind.ordinal + if (isPre) 100 else 0, notification)
@@ -155,6 +158,7 @@ class ReminderScheduler @Inject constructor(
     private suspend fun notificationContent(
         kind: ReminderKind,
         isPre: Boolean,
+        now: Instant,
     ): Triple<String, String, String> = when (kind) {
         ReminderKind.MorningAdhkar -> Triple(
             NotificationChannels.ADHKAR_REMINDERS,
@@ -171,7 +175,7 @@ class ReminderScheduler @Inject constructor(
         else -> {
             val prayer = requireNotNull(kind.prayer)
             val prayerName = context.getString(prayer.labelRes())
-            val dayTimes = prayerTimesService.observeTimes(LocalDate.now()).first()
+            val dayTimes = prayerTimesService.observeCurrentTimes(now).first()
             if (isPre) {
                 Triple(
                     NotificationChannels.ADHKAR_REMINDERS,
@@ -199,9 +203,9 @@ class ReminderScheduler @Inject constructor(
     private fun contentIntent(destination: NotificationDestination): PendingIntent =
         PendingIntent.getActivity(
             context,
-            destination.ordinal,
+            destination.requestCode,
             Intent(context, MainActivity::class.java).apply {
-                putExtra(NotificationDestination.EXTRA, destination.name)
+                putExtra(NotificationDestination.EXTRA, destination.intentValue)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,

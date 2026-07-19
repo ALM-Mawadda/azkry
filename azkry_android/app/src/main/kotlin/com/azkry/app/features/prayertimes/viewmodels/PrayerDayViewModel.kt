@@ -5,12 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.azkry.app.app.AppSettingsService
 import com.azkry.app.core.models.Prayer
+import com.azkry.app.core.utilities.CurrentDateProvider
 import com.azkry.app.core.utilities.toDateKey
 import com.azkry.app.core.utilities.toHijriDayMonth
 import com.azkry.app.features.prayertimes.services.PrayerTimesService
+import com.azkry.app.features.prayertimes.services.PrayerSettingsService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
@@ -45,20 +46,35 @@ private val timeFormatter = DateTimeFormatter.ofPattern("hh:mm", Locale.ENGLISH)
 @HiltViewModel
 class PrayerDayViewModel @Inject constructor(
     private val prayerTimesService: PrayerTimesService,
+    prayerSettingsService: PrayerSettingsService,
     appSettingsService: AppSettingsService,
+    currentDateProvider: CurrentDateProvider,
 ) : ViewModel() {
-    private val selectedDate = MutableStateFlow(LocalDate.now())
+    private val dayOffset = MutableStateFlow(0L)
 
     private val hijriOffsetDays = appSettingsService.settings.map { it.hijriOffsetDays }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentDate = prayerSettingsService.settings.flatMapLatest { settings ->
+        currentDateProvider.observeCurrentDate(settings.zoneId)
+    }
+
+    private val selectedDate = combine(dayOffset, currentDate) { offset, today ->
+        today.plusDays(offset)
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<PrayerDayUiState?> =
         selectedDate
             .flatMapLatest { date ->
-                combine(prayerTimesService.observeTimes(date), hijriOffsetDays) { dayTimes, hijriOffset ->
-                    val today = LocalDate.now()
+                combine(
+                    prayerTimesService.observeTimes(date),
+                    hijriOffsetDays,
+                    currentDate,
+                ) { dayTimes, hijriOffset, today ->
+                    val now = Instant.now()
                     val next = if (date == today) {
-                        prayerTimesService.nextPrayer(LocalDateTime.now(), dayTimes)
+                        prayerTimesService.nextPrayer(now, dayTimes)
                             .takeIf { it.at.toLocalDate() == today }
                     } else {
                         null
@@ -85,14 +101,14 @@ class PrayerDayViewModel @Inject constructor(
             )
 
     fun onPreviousDay() {
-        selectedDate.update { it.minusDays(1) }
+        dayOffset.update { it - 1 }
     }
 
     fun onNextDay() {
-        selectedDate.update { it.plusDays(1) }
+        dayOffset.update { it + 1 }
     }
 
     fun onBackToToday() {
-        selectedDate.update { LocalDate.now() }
+        dayOffset.value = 0L
     }
 }

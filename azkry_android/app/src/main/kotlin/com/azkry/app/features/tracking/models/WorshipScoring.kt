@@ -1,6 +1,8 @@
 package com.azkry.app.features.tracking.models
 
 import com.azkry.app.core.models.Prayer
+import com.azkry.app.core.models.WorshipSection
+import com.azkry.app.core.models.WorshipTask
 
 /**
  * Day-completion percentage with the design's default weights: prayers 50%,

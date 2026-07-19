@@ -49,11 +49,7 @@ class RoomAdhkarService @Inject constructor(
         adhkarDao.observeDailyCounts(categoryId, date)
 
     override suspend fun incrementCount(dhikr: Dhikr, date: String) {
-        val current = adhkarDao.dailyCount(dhikr.id, date) ?: 0
-        if (current >= dhikr.repeatCount) return
-        adhkarDao.upsertDailyCount(
-            DhikrDailyCount(date = date, dhikrId = dhikr.id, count = current + 1),
-        )
+        adhkarDao.incrementDailyCount(dhikr.id, date)
     }
 
     override suspend fun resetCount(dhikrId: Long, date: String) {

@@ -45,6 +45,18 @@ class AthkarSeedContentTest {
     }
 
     @Test
+    fun `generated backup identities are unique and stable`() {
+        val keys = content.categories.flatMap { category ->
+            category.items.mapIndexed { index, item ->
+                stableDhikrKey(category.key, item, index)
+            }
+        }
+
+        assertEquals(keys.distinct(), keys)
+        assertEquals("morning/item_1", keys.first())
+    }
+
+    @Test
     fun `titled categories keep their titles`() {
         val misc = content.categories.first { it.key == "misc" }
         assertEquals(90, misc.items.size)

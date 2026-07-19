@@ -79,7 +79,7 @@ fun PrayerDayTabContent(
             IconButton(onClick = onPreviousDay) {
                 Icon(
                     imageVector = Icons.Outlined.KeyboardArrowRight,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.action_previous_day),
                     tint = AzkryTheme.colors.TextSecondary,
                 )
             }
@@ -108,7 +108,7 @@ fun PrayerDayTabContent(
             IconButton(onClick = onNextDay) {
                 Icon(
                     imageVector = Icons.Outlined.KeyboardArrowLeft,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.action_next_day),
                     tint = AzkryTheme.colors.TextSecondary,
                 )
             }

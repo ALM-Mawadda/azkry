@@ -42,8 +42,8 @@ import com.azkry.app.core.theme.AzkryTheme
 import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
 import com.azkry.app.core.theme.AzkryTextStyles
-import com.azkry.app.features.tracking.models.WorshipSection
-import com.azkry.app.features.tracking.models.WorshipTask
+import com.azkry.app.core.models.WorshipSection
+import com.azkry.app.core.models.WorshipTask
 import com.azkry.app.features.tracking.services.AdhkarCategoryProgress
 import com.azkry.app.features.tracking.viewmodels.PrayerCell
 import com.azkry.app.features.tracking.viewmodels.TrackingUiState

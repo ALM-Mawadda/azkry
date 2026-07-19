@@ -39,6 +39,26 @@ interface AdhkarDao {
     @Upsert
     suspend fun upsertDailyCounts(counts: List<DhikrDailyCount>)
 
+    /**
+     * Inserts or increments one daily counter in a single SQLite statement.
+     * The cap is read from the authoritative dhikr row, so concurrent taps
+     * cannot lose increments or exceed the current repeat count.
+     */
+    @Query(
+        """
+        INSERT OR REPLACE INTO dhikr_daily_counts (date, dhikrId, count)
+        SELECT :date, a.id,
+            CASE
+                WHEN COALESCE(c.count, 0) < a.repeatCount THEN COALESCE(c.count, 0) + 1
+                ELSE COALESCE(c.count, 0)
+            END
+        FROM adhkar a
+        LEFT JOIN dhikr_daily_counts c ON c.date = :date AND c.dhikrId = a.id
+        WHERE a.id = :dhikrId AND a.repeatCount > 0
+        """,
+    )
+    suspend fun incrementDailyCount(dhikrId: Long, date: String)
+
     @Query("DELETE FROM dhikr_daily_counts WHERE date = :date AND dhikrId = :dhikrId")
     suspend fun resetDailyCount(dhikrId: Long, date: String)
 
@@ -97,6 +117,9 @@ interface AdhkarDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFavorite(favorite: FavoriteDhikr)
 
+    @Upsert
+    suspend fun upsertFavorites(favorites: List<FavoriteDhikr>)
+
     @Query("DELETE FROM favorite_adhkar WHERE dhikrId = :dhikrId")
     suspend fun deleteFavorite(dhikrId: Long)
 
@@ -127,17 +150,21 @@ interface AdhkarDao {
     @Query("DELETE FROM dhikr_categories")
     suspend fun clearAllCategories()
 
+    @Query("DELETE FROM dhikr_daily_counts")
+    suspend fun clearAllDailyCounts()
+
     /**
-     * Atomically replaces the whole seeded library. Deleting categories
-     * cascades through adhkar to favorites and daily counts, so a content
-     * upgrade starts those clean. Each item's categoryId is rewritten to the
-     * freshly inserted category.
+     * Atomically replaces the whole seeded library. Daily counts are cleared
+     * explicitly and deleting categories cascades through adhkar to favorites,
+     * so a content upgrade starts those clean. Each item's categoryId is
+     * rewritten to the freshly inserted category.
      */
     @Transaction
     suspend fun replaceSeededContent(
         categoriesWithItems: List<Pair<DhikrCategory, List<Dhikr>>>,
         revision: Int,
     ) {
+        clearAllDailyCounts()
         clearAllCategories()
         categoriesWithItems.forEach { (category, items) ->
             val categoryId = insertCategory(category)

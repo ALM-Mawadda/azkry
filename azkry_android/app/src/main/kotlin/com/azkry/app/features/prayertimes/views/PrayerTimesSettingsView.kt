@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.azkry.app.R
 import com.azkry.app.core.components.CenteredProgress
+import com.azkry.app.core.components.RadioPickerDialog
 import com.azkry.app.core.components.ScreenHeader
 import com.azkry.app.core.prayertimes.AsrMadhab
 import com.azkry.app.core.prayertimes.CalculationMethod
@@ -47,6 +46,7 @@ import com.azkry.app.core.theme.AzkrySpacing
 import com.azkry.app.core.theme.AzkryTextStyles
 import com.azkry.app.features.prayertimes.services.PrayerSettings
 import com.azkry.app.features.prayertimes.viewmodels.PrayerTimesSettingsViewModel
+import java.time.ZoneId
 import java.util.Locale
 
 private enum class OpenPicker { None, Method, AsrMadhab, HighLatitude, Location }
@@ -91,7 +91,7 @@ fun PrayerTimesSettingsContent(
     onMethodSelected: (CalculationMethod) -> Unit,
     onAsrMadhabSelected: (AsrMadhab) -> Unit,
     onHighLatitudeRuleSelected: (HighLatitudeRule) -> Unit,
-    onManualLocationEntered: (String, Double, Double) -> Unit,
+    onManualLocationEntered: (String, Double, Double, ZoneId) -> Unit,
     onUseCurrentLocation: () -> Unit,
 ) {
     var openPicker by rememberSaveable { mutableStateOf(OpenPicker.None) }
@@ -118,9 +118,13 @@ fun PrayerTimesSettingsContent(
                 title = stringResource(R.string.prayer_settings_location),
                 value = settings.cityName,
                 secondary = stringResource(
-                    R.string.prayer_settings_coordinates,
-                    formatCoordinate(settings.location.longitude),
-                    formatCoordinate(settings.location.latitude),
+                    R.string.prayer_settings_location_details,
+                    stringResource(
+                        R.string.prayer_settings_coordinates,
+                        formatCoordinate(settings.location.longitude),
+                        formatCoordinate(settings.location.latitude),
+                    ),
+                    settings.zoneId.id,
                 ),
                 isBusy = isLocating,
                 onClick = { openPicker = OpenPicker.Location },
@@ -190,8 +194,8 @@ fun PrayerTimesSettingsContent(
         OpenPicker.Location -> if (settings != null) {
             LocationDialog(
                 settings = settings,
-                onManualLocationEntered = { city, lat, lng ->
-                    onManualLocationEntered(city, lat, lng)
+                onManualLocationEntered = { city, lat, lng, zoneId ->
+                    onManualLocationEntered(city, lat, lng, zoneId)
                     openPicker = OpenPicker.None
                 },
                 onUseCurrentLocation = {
@@ -207,64 +211,22 @@ fun PrayerTimesSettingsContent(
 }
 
 @Composable
-private fun <T> RadioPickerDialog(
-    title: String,
-    options: List<Pair<T, String>>,
-    selected: T?,
-    onSelected: (T) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = AzkryTheme.colors.SurfaceSheet,
-        titleContentColor = AzkryTheme.colors.TextPrimary,
-        textContentColor = AzkryTheme.colors.TextPrimary,
-        title = { Text(text = title, style = AzkryTextStyles.Title3) },
-        text = {
-            Column {
-                options.forEach { (option, label) ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = option == selected,
-                                onClick = { onSelected(option) },
-                            )
-                            .padding(vertical = AzkrySpacing.Xs),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
-                    ) {
-                        RadioButton(
-                            selected = option == selected,
-                            onClick = { onSelected(option) },
-                        )
-                        Text(text = label, style = AzkryTextStyles.Body)
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.action_close))
-            }
-        },
-    )
-}
-
-@Composable
 private fun LocationDialog(
     settings: PrayerSettings,
-    onManualLocationEntered: (String, Double, Double) -> Unit,
+    onManualLocationEntered: (String, Double, Double, ZoneId) -> Unit,
     onUseCurrentLocation: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     var city by rememberSaveable { mutableStateOf(settings.cityName) }
     var latitude by rememberSaveable { mutableStateOf(settings.location.latitude.toString()) }
     var longitude by rememberSaveable { mutableStateOf(settings.location.longitude.toString()) }
+    var zoneIdText by rememberSaveable { mutableStateOf(settings.zoneId.id) }
 
     val parsedLatitude = latitude.toDoubleOrNull()?.takeIf { it in -90.0..90.0 }
     val parsedLongitude = longitude.toDoubleOrNull()?.takeIf { it in -180.0..180.0 }
-    val isValid = city.isNotBlank() && parsedLatitude != null && parsedLongitude != null
+    val parsedZoneId = runCatching { ZoneId.of(zoneIdText.trim()) }.getOrNull()
+    val isValid = city.isNotBlank() && parsedLatitude != null &&
+        parsedLongitude != null && parsedZoneId != null
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -278,7 +240,10 @@ private fun LocationDialog(
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
+            ) {
                 TextButton(onClick = onUseCurrentLocation) {
                     Text(text = stringResource(R.string.prayer_settings_use_current))
                 }
@@ -302,13 +267,26 @@ private fun LocationDialog(
                     singleLine = true,
                     isError = parsedLongitude == null,
                 )
+                OutlinedTextField(
+                    value = zoneIdText,
+                    onValueChange = { zoneIdText = it },
+                    label = { Text(stringResource(R.string.prayer_settings_timezone)) },
+                    supportingText = { Text(stringResource(R.string.prayer_settings_timezone_hint)) },
+                    singleLine = true,
+                    isError = parsedZoneId == null,
+                )
             }
         },
         confirmButton = {
             TextButton(
                 enabled = isValid,
                 onClick = {
-                    onManualLocationEntered(city.trim(), parsedLatitude!!, parsedLongitude!!)
+                    onManualLocationEntered(
+                        city.trim(),
+                        parsedLatitude!!,
+                        parsedLongitude!!,
+                        parsedZoneId!!,
+                    )
                 },
             ) {
                 Text(text = stringResource(R.string.action_save))
@@ -407,7 +385,7 @@ private fun PrayerTimesSettingsContentPreview() {
             onMethodSelected = {},
             onAsrMadhabSelected = {},
             onHighLatitudeRuleSelected = {},
-            onManualLocationEntered = { _, _, _ -> },
+            onManualLocationEntered = { _, _, _, _ -> },
             onUseCurrentLocation = {},
         )
     }

@@ -10,6 +10,7 @@ import com.azkry.app.features.settings.services.BackupService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,17 +30,22 @@ class SettingsViewModel @Inject constructor(
 
     fun onExportBackup(target: Uri) {
         viewModelScope.launch {
-            val result = runCatching {
+            val succeeded = try {
                 val payload = backupService.exportJson()
                 withContext(Dispatchers.IO) {
                     context.contentResolver.openOutputStream(target)?.use { stream ->
                         stream.write(payload.toByteArray())
                     } ?: error("stream unavailable")
                 }
+                true
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Throwable) {
+                false
             }
             internalMessages.emit(
                 strings.get(
-                    if (result.isSuccess) R.string.backup_export_done else R.string.backup_failed,
+                    if (succeeded) R.string.backup_export_done else R.string.backup_failed,
                 ),
             )
         }
@@ -47,14 +53,18 @@ class SettingsViewModel @Inject constructor(
 
     fun onImportBackup(source: Uri) {
         viewModelScope.launch {
-            val imported = runCatching {
+            val imported = try {
                 val text = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(source)?.use { stream ->
                         stream.bufferedReader().readText()
                     } ?: error("stream unavailable")
                 }
                 backupService.importJson(text)
-            }.getOrDefault(false)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Throwable) {
+                false
+            }
             internalMessages.emit(
                 strings.get(
                     if (imported) R.string.backup_import_done else R.string.backup_failed,

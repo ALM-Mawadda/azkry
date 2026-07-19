@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -20,12 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.azkry.app.R
 import com.azkry.app.core.components.CenteredProgress
 import com.azkry.app.core.components.ProgressRing
+import com.azkry.app.core.components.SelectablePill
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
 import com.azkry.app.core.theme.AzkryTheme
@@ -71,12 +74,16 @@ fun CounterTabContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(AzkrySpacing.Lg),
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm)) {
+        Row(
+            modifier = Modifier.selectableGroup(),
+            horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
+        ) {
             COUNTER_TARGETS.forEach { target ->
-                TargetChip(
-                    target = target,
-                    isSelected = state.target == target,
+                SelectablePill(
+                    label = if (target == 0) "∞" else target.toString(),
+                    selected = state.target == target,
                     onClick = { onTargetSelected(target) },
+                    role = Role.RadioButton,
                 )
             }
         }
@@ -142,33 +149,6 @@ fun CounterTabContent(
                 ),
             )
         }
-    }
-}
-
-@Composable
-private fun TargetChip(
-    target: Int,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(AzkryRadius.Pill),
-        color = if (isSelected) AzkryTheme.colors.SurfaceCardStrong else AzkryTheme.colors.SurfaceCard,
-        contentColor = if (isSelected) AzkryTheme.colors.TextPrimary else AzkryTheme.colors.TextSecondary,
-        border = BorderStroke(
-            1.dp,
-            if (isSelected) AzkryTheme.colors.AccentYellow else AzkryTheme.colors.BorderDefault,
-        ),
-    ) {
-        Text(
-            text = if (target == 0) "∞" else target.toString(),
-            style = AzkryTextStyles.Callout,
-            modifier = Modifier.padding(
-                horizontal = AzkrySpacing.Md,
-                vertical = AzkrySpacing.Sm,
-            ),
-        )
     }
 }
 

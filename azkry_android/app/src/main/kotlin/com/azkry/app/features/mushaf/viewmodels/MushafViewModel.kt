@@ -3,6 +3,7 @@ package com.azkry.app.features.mushaf.viewmodels
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.azkry.app.core.utilities.CurrentDateProvider
 import com.azkry.app.core.utilities.toDateKey
 import com.azkry.app.features.mushaf.models.JuzStart
 import com.azkry.app.features.mushaf.models.Khatmah
@@ -60,6 +61,7 @@ data class MushafUiState(
 @HiltViewModel
 class MushafViewModel @Inject constructor(
     private val quranService: QuranService,
+    private val currentDateProvider: CurrentDateProvider,
 ) : ViewModel() {
     private val index = MutableStateFlow(MushafUiState())
 
@@ -69,11 +71,12 @@ class MushafViewModel @Inject constructor(
             quranService.lastRead,
             quranService.bookmarks,
             quranService.khatmah,
-        ) { current, lastRead, bookmarks, khatmah ->
+            currentDateProvider.observeCurrentDate(),
+        ) { current, lastRead, bookmarks, khatmah, currentDate ->
             current.copy(
                 lastRead = lastRead,
                 bookmarks = bookmarks,
-                khatmah = khatmah?.let { plan -> progressOf(plan, lastRead) },
+                khatmah = khatmah?.let { plan -> progressOf(plan, lastRead, currentDate) },
             )
         }.stateIn(
             scope = viewModelScope,
@@ -108,7 +111,7 @@ class MushafViewModel @Inject constructor(
 
     fun onStartKhatmah(totalDays: Int) {
         viewModelScope.launch {
-            quranService.startKhatmah(totalDays, LocalDate.now().toDateKey())
+            quranService.startKhatmah(totalDays, currentDateProvider.currentDate().toDateKey())
         }
     }
 
@@ -118,9 +121,13 @@ class MushafViewModel @Inject constructor(
         }
     }
 
-    private fun progressOf(plan: Khatmah, lastRead: LastRead?): KhatmahProgress {
-        val start = runCatching { LocalDate.parse(plan.startDateKey) }.getOrNull() ?: LocalDate.now()
-        val dayNumber = (ChronoUnit.DAYS.between(start, LocalDate.now()) + 1)
+    private fun progressOf(
+        plan: Khatmah,
+        lastRead: LastRead?,
+        currentDate: LocalDate,
+    ): KhatmahProgress {
+        val start = runCatching { LocalDate.parse(plan.startDateKey) }.getOrNull() ?: currentDate
+        val dayNumber = (ChronoUnit.DAYS.between(start, currentDate) + 1)
             .coerceIn(1, plan.totalDays.toLong())
             .toInt()
         val targetPage = ceil(Khatmah.TOTAL_PAGES.toDouble() * dayNumber / plan.totalDays)
