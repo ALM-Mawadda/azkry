@@ -19,3 +19,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+This license applies to the original Azkry software and documentation. Bundled
+third-party assets and source texts remain under their respective licenses and
+notices. In particular, the Tanzil Quran text is distributed under CC BY 3.0
+with a no-modification condition, and bundled fonts remain under SIL OFL 1.1.
+See each platform's THIRD_PARTY_NOTICES file for details.

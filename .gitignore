@@ -12,6 +12,13 @@ azkry_android/.kotlin/
 azkry_android/local.properties
 azkry_android/**/build/
 
+# iOS / Xcode
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserstate
+azkary_ios/build/
+
 # JetBrains IDEs (Android Studio / IntelliJ)
 .idea/
 *.iml
@@ -27,4 +34,5 @@ secrets.properties
 # Re-include agent docs excluded by the user's global gitignore
 !/AGENTS.md
 !/azkry_android/AGENTS.md
+!/azkary_ios/AGENTS.md
 !/CLAUDE.md

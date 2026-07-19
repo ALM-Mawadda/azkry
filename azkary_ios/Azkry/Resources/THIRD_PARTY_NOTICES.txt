@@ -1,0 +1,34 @@
+AZKRY THIRD-PARTY NOTICES
+
+Quran text
+----------
+Tanzil Quran Text
+Copyright (C) 2007-2021 Tanzil Project
+License: Creative Commons Attribution 3.0
+
+This copy of the Quran text is carefully produced, highly verified and
+continuously monitored by a group of specialists in Tanzil Project.
+
+Permission is granted to copy and distribute verbatim copies of this text,
+but changing it is not allowed. This application preserves the bundled text
+verbatim. Source and updates: https://tanzil.net
+Full terms: https://tanzil.net/docs/Text_License
+
+Fonts
+-----
+Almarai: Copyright 2019 The Almarai Project Authors
+https://github.com/JuergenWillrodt/Almarai
+
+Amiri and Amiri Quran: Copyright 2010-2022 The Amiri Project Authors
+https://github.com/aliftype/amiri
+
+These font files are distributed under the SIL Open Font License, Version 1.1.
+The complete license and copyright notices are included in OFL-Fonts.txt.
+
+Adhkar and page content
+-----------------------
+The adhkar collection was imported from the reference Athkar application and
+augmented with traditional public religious texts. The repository's MIT
+license does not claim ownership over Quran verses, hadith, or other religious
+source texts. Provenance and scholarly verification must be completed before
+public App Store distribution.

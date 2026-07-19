@@ -1,0 +1,82 @@
+name: Azkry
+options:
+  bundleIdPrefix: com.azkry
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "26"
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+
+settings:
+  base:
+    SWIFT_VERSION: "6.2"
+    INFOPLIST_FILE: azkry-ios-Info.plist
+    TARGETED_DEVICE_FAMILY: "1"
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: true
+
+targets:
+  Azkry:
+    type: application
+    platform: iOS
+    sources:
+      - path: Azkry
+        excludes:
+          - "**/.DS_Store"
+          - "**/.gitkeep"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.azkry.app
+        PRODUCT_NAME: Azkry
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1"
+      configs:
+        Debug:
+          OTHER_SWIFT_FLAGS: "-DDEBUG"
+        Release:
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+    info:
+      path: azkry-ios-Info.plist
+      properties:
+        CFBundleDisplayName: "أذكاري"
+        UILaunchScreen: {}
+        ITSAppUsesNonExemptEncryption: false
+        NSLocationWhenInUseUsageDescription: "يستخدم أذكاري موقعك لحساب مواقيت الصلاة واتجاه القبلة بدقة، ولا يرسل موقعك إلى أي خادم."
+        UIAppFonts:
+          - Almarai-Regular.ttf
+          - Almarai-Light.ttf
+          - Almarai-Bold.ttf
+          - Almarai-ExtraBold.ttf
+          - Amiri-Regular.ttf
+          - AmiriQuran-Regular.ttf
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+
+  AzkryTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: AzkryTests
+        createIntermediateGroups: true
+    dependencies:
+      - target: Azkry
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.azkry.app.tests
+        TARGETED_DEVICE_FAMILY: "1"
+
+  AzkryUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: AzkryUITests
+        createIntermediateGroups: true
+    dependencies:
+      - target: Azkry
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.azkry.app.uitests
+        TEST_TARGET_NAME: Azkry
+        TARGETED_DEVICE_FAMILY: "1"
