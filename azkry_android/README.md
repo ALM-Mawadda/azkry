@@ -64,6 +64,8 @@ Daily data keys on the local ISO date, so a new day naturally starts fresh witho
 
 The default location is Mecca (`Asia/Riyadh`). Settings support current-location refresh or manual city/coordinates/timezone entry.
 
+The الصلاة tab in the home strip is a destination, not an inline tab: it opens the full-screen day board (`features/prayertimes/views/PrayerDayScreen.kt`), which shows the calculated adhan times for the configured location, a live countdown to the next prayer, and the current forbidden-prayer window. It shows **adhan times only** — iqama times are set by each mosque and cannot be calculated, so the app does not display them. The one derived time it does show is the start of Ishraq, computed from the calculated sunrise.
+
 ## Quran (Mushaf)
 
 The full Uthmani text ships with the app (public Tanzil text via the
@@ -86,7 +88,8 @@ settings → إشعارات الأذكار والأذان.
 | Screen | Status |
 | --- | --- |
 | Home hub (verse header, prayer strip, adhan countdown, sections) | Working |
-| Home tabs: الصلاة (day times), القبلة (compass), المفضلة, العداد | Working |
+| Home tabs: القبلة (compass), المفضلة, العداد | Working |
+| الصلاة day board (full screen: next-prayer countdown, forbidden times, day stepping) | Working |
 | Adhkar categories + dhikr reader (counters, favorites, details sheet, auto-advance, celebration) — full iOS Athkar library: 11 categories / 339 items with titles, virtues, sources | Working |
 | Search (normalized Arabic across adhkar + surah names) | Working |
 | Mushaf (surah/juz/pages tabs, reader, bookmarks, khatmah, last-read) | Working |

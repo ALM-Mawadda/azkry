@@ -23,6 +23,7 @@ import com.azkry.app.features.notifications.views.NotificationSettingsView
 import com.azkry.app.features.pages.models.PageKey
 import com.azkry.app.features.pages.views.PageDetailView
 import com.azkry.app.features.pages.views.PagesView
+import com.azkry.app.features.prayertimes.views.PrayerDayScreen
 import com.azkry.app.features.prayertimes.views.PrayerTimesSettingsView
 import com.azkry.app.features.search.views.SearchView
 import com.azkry.app.features.settings.views.SettingsNavigation
@@ -36,6 +37,7 @@ enum class MainScreen {
     Tracking,
     AdhkarCategories,
     Mushaf,
+    PrayerDay,
     Pages,
     Friday,
     Search,
@@ -169,6 +171,7 @@ fun MainShell(
                 onOpenSearch = { screen = MainScreen.Search },
                 onOpenExclusive = { screen = MainScreen.Exclusive },
                 onOpenCategoryReader = { categoryId -> readerCategoryId = categoryId },
+                onOpenPrayerDay = { screen = MainScreen.PrayerDay },
             ),
         )
 
@@ -184,6 +187,11 @@ fun MainShell(
         MainScreen.Mushaf -> MushafView(
             onBack = { screen = MainScreen.Home },
             onOpenSurah = ::openSurah,
+        )
+
+        MainScreen.PrayerDay -> PrayerDayScreen(
+            onBack = { screen = MainScreen.Home },
+            onOpenForbiddenTimes = { openPageKey = PageKey.ForbiddenTimes.name },
         )
 
         MainScreen.Pages -> PagesView(

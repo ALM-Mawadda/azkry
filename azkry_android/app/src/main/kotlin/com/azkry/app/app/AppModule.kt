@@ -28,8 +28,10 @@ import com.azkry.app.features.tracking.services.RoomWorshipTrackingService
 import com.azkry.app.features.tracking.services.WorshipTrackingService
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import javax.inject.Singleton
 
 @Module
@@ -92,4 +94,11 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindPagesService(service: StaticPagesService): PagesService
+
+    companion object {
+        /** A small seam so time-dependent screens stay unit-testable. */
+        @Provides
+        @Singleton
+        fun provideClock(): Clock = Clock.systemDefaultZone()
+    }
 }

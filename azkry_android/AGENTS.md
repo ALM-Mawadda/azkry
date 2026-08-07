@@ -41,8 +41,9 @@ app/src/main/kotlin/com/azkry/app/
     adhkar/{services,viewmodels,views}       # categories, dhikr reader, favorites tab
     tracking/{models,services,viewmodels,views}  # worship tracking (prayers/adhkar/tasks)
     mushaf/{models,services,viewmodels,views}    # Quran: bundled text, surah/juz lists, reader
-    prayertimes/{services,viewmodels,views}  # calculation service, day tab, editable settings,
-                                             # fused location + geocoder
+    prayertimes/{models,services,viewmodels,views}
+                               # calculation service, full-screen day board,
+                               # editable settings, fused location + geocoder
     qibla/{models,services,viewmodels,views} # bearing math + compass sensor + dial tab
     counter/{services,viewmodels,views}      # persistent tasbih counter tab
     friday/{models,services,viewmodels,views} # Friday sunan checklist + fadail page
@@ -82,7 +83,19 @@ progressively (scroll-offset alpha) before collapsing into the pinned bar
 (wordmark + actions + tabs via `stickyHeader`); cards are
 soft-radius (26dp) with hairline borders; mushaf screens sit on the darker
 `MushafBackground`; the hijri chip is two-line (day over month). Header text
-is always light — it sits on the sky, not the page.
+is always light — it sits on the sky, not the page. الصلاة in the home tab strip
+is a **destination, not an inline tab**: it opens the full-screen
+`PrayerDayScreen` (city header, calligraphy card, date pills, next-prayer card
+with live countdown, forbidden-times row, grouped prayer list) with no home
+chrome behind it.
+
+Prayer times shown anywhere in the app are calculated for the user's configured
+location — detected via `PrayerLocationRefresher` or chosen in prayer settings —
+and never hardcoded. The screen displays **adhan times only**: iqama is set by
+each mosque and cannot be derived, so the app must not state one. The single
+exception is the start of Ishraq, which `PrayerDayView` computes from the
+calculated sunrise using the same "قيد رمح" constant that closes the after-Fajr
+forbidden window — one basis, one constant.
 
 The folders above are the default target shape. Add feature-local `models/` only when the type is not a database/shared app model.
 

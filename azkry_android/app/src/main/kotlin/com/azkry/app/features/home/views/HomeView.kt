@@ -93,7 +93,6 @@ import com.azkry.app.features.counter.views.CounterTabView
 import com.azkry.app.features.home.models.HeaderPhase
 import com.azkry.app.features.home.viewmodels.HomeUiState
 import com.azkry.app.features.home.viewmodels.HomeViewModel
-import com.azkry.app.features.prayertimes.views.PrayerDayTabView
 import com.azkry.app.features.qibla.views.QiblaTabView
 
 enum class HomeTab(val titleRes: Int) {
@@ -115,6 +114,7 @@ data class HomeNavigation(
     val onOpenSearch: () -> Unit,
     val onOpenExclusive: () -> Unit,
     val onOpenCategoryReader: (Long) -> Unit,
+    val onOpenPrayerDay: () -> Unit,
 )
 
 /** Header text stays light in every phase — it sits on the sky, not the page. */
@@ -199,7 +199,9 @@ fun HomeContent(
                 }
             }
 
-            HomeTab.Prayer -> item { PrayerDayTabView() }
+            // الصلاة is a destination, not an inline tab: tapping it opens
+            // the full-screen prayer board, so nothing renders here.
+            HomeTab.Prayer -> Unit
             HomeTab.Qibla -> item { QiblaTabView() }
             HomeTab.Favorites -> item { FavoritesTabView() }
             HomeTab.Counter -> item { CounterTabView() }
@@ -287,7 +289,16 @@ private fun PinnedBar(
                     HeaderActionsRow(navigation = navigation, showLogo = true, onSky = false)
                 }
             }
-            HomeTabsRow(selectedTab = selectedTab, onTabSelected = onTabSelected)
+            HomeTabsRow(
+                selectedTab = selectedTab,
+                onTabSelected = { tab ->
+                    if (tab == HomeTab.Prayer) {
+                        navigation.onOpenPrayerDay()
+                    } else {
+                        onTabSelected(tab)
+                    }
+                },
+            )
         }
     }
 }
@@ -841,6 +852,7 @@ private fun HomeContentPreview() {
                 onOpenSearch = {},
                 onOpenExclusive = {},
                 onOpenCategoryReader = {},
+                onOpenPrayerDay = {},
             ),
         )
     }

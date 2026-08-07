@@ -43,6 +43,14 @@
     <string name="prayer_asr">العصر</string>
     <string name="prayer_maghrib">المغرب</string>
     <string name="prayer_isha">العشاء</string>
+    <string name="prayer_am">ص</string>
+    <string name="prayer_pm">م</string>
+    <string name="prayer_next_label">الصلاة القادمة</string>
+    <string name="prayer_ishraq_line">بداية الإشراق : %1$s</string>
+    <string name="prayer_forbidden_title">أوقات النهي عن الصلاة</string>
+    <string name="prayer_forbidden_after_fajr">من بعد صلاة الفجر إلى ارتفاع الشمس</string>
+    <string name="prayer_forbidden_zawal">عند استواء الشمس حتى تزول</string>
+    <string name="prayer_forbidden_after_asr">من بعد صلاة العصر إلى أذان المغرب</string>
 
     <!-- Adhan countdown -->
     <string name="adhan_countdown_line">أذان %1$s بعد %2$s</string>
