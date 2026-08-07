@@ -114,7 +114,6 @@ settings → إشعارات الأذكار والأذان.
 
 ## Roadmap / TODO
 
-- Scholarly review of all adhkar texts (mandatory before public release) and a full tashkeel pass over the hadith-based items.
 - Per-prayer adhan sound selection; full-screen منبه الصلاة alarm mode.
 - Multi-language (the settings row is display-only), Quran translations.
 - Widget theming options and a prayer-times week widget.
