@@ -45,7 +45,6 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
@@ -68,6 +67,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -82,6 +82,7 @@ import com.azkry.app.core.models.labelRes
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
 import com.azkry.app.core.preview.Samples
+import com.azkry.app.core.theme.AzkryIcons
 import com.azkry.app.core.theme.AzkryFonts
 import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
@@ -730,6 +731,9 @@ private fun InnerRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            // One row, one TalkBack stop: the title announces it, so the icon
+            // and chevron stay decorative with no description.
+            .semantics(mergeDescendants = true) {}
             .padding(horizontal = AzkrySpacing.Md, vertical = AzkrySpacing.Md),
         horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.S12),
         verticalAlignment = Alignment.CenterVertically,
@@ -755,7 +759,7 @@ private fun InnerRow(
             modifier = Modifier.weight(1f),
         )
         Icon(
-            imageVector = Icons.Outlined.KeyboardArrowLeft,
+            imageVector = AzkryIcons.Forward,
             contentDescription = null,
             tint = AzkryTheme.colors.TextTertiary,
         )

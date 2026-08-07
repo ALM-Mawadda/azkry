@@ -15,7 +15,7 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.EventRepeat
-import androidx.compose.material.icons.outlined.ManageSearch
+import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material.icons.outlined.WbSunny
@@ -110,7 +110,7 @@ fun pageIcon(key: PageKey): ImageVector = when (key) {
     PageKey.ForbiddenTimes -> Icons.Outlined.AlarmOff
     PageKey.RamadanQada -> Icons.Outlined.EventRepeat
     PageKey.DeceasedDuas -> Icons.Outlined.Spa
-    PageKey.AyahTafsir -> Icons.Outlined.ManageSearch
+    PageKey.AyahTafsir -> Icons.AutoMirrored.Outlined.ManageSearch
 }
 
 @AzkryPreview

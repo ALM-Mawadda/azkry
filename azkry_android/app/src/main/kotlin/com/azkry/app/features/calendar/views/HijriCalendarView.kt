@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -30,6 +28,7 @@ import com.azkry.app.core.components.CenteredProgress
 import com.azkry.app.core.components.ScreenHeader
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
+import com.azkry.app.core.theme.AzkryIcons
 import com.azkry.app.core.theme.AzkryTheme
 import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
@@ -89,7 +88,7 @@ fun HijriCalendarContent(
                 // In RTL the right arrow moves backwards in time.
                 IconButton(onClick = onPreviousMonth) {
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                        imageVector = AzkryIcons.Back,
                         contentDescription = stringResource(R.string.action_previous_month),
                         tint = AzkryTheme.colors.TextSecondary,
                     )
@@ -102,7 +101,7 @@ fun HijriCalendarContent(
                 )
                 IconButton(onClick = onNextMonth) {
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowLeft,
+                        imageVector = AzkryIcons.Forward,
                         contentDescription = stringResource(R.string.action_next_month),
                         tint = AzkryTheme.colors.TextSecondary,
                     )

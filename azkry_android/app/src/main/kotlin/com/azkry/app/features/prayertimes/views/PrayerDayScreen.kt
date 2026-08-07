@@ -18,8 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DarkMode
-import androidx.compose.material.icons.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,6 +47,7 @@ import com.azkry.app.core.models.Prayer
 import com.azkry.app.core.models.labelRes
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
+import com.azkry.app.core.theme.AzkryIcons
 import com.azkry.app.core.theme.AzkryFonts
 import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
@@ -107,14 +107,14 @@ fun PrayerDayContent(
                 // stays as clean as the design.
                 IconButton(onClick = onNextDay) {
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowLeft,
+                        imageVector = AzkryIcons.Forward,
                         contentDescription = stringResource(R.string.action_next_day),
                         tint = AzkryTheme.colors.TextSecondary,
                     )
                 }
                 IconButton(onClick = onPreviousDay) {
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                        imageVector = AzkryIcons.Back,
                         contentDescription = stringResource(R.string.action_previous_day),
                         tint = AzkryTheme.colors.TextSecondary,
                     )
@@ -298,6 +298,9 @@ private fun ForbiddenTimesRow(window: ForbiddenWindow, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            // One row, one TalkBack stop: the title and description announce
+            // it, so the accent bar and chevron stay decorative.
+            .semantics(mergeDescendants = true) {}
             .padding(horizontal = AzkrySpacing.Md, vertical = AzkrySpacing.Md),
         horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.S12),
         verticalAlignment = Alignment.CenterVertically,
@@ -325,7 +328,7 @@ private fun ForbiddenTimesRow(window: ForbiddenWindow, onClick: () -> Unit) {
         // Deliberately not auto-mirrored: the design's forward chevron points
         // left, matching this RTL-only app.
         Icon(
-            imageVector = Icons.Outlined.KeyboardArrowLeft,
+            imageVector = AzkryIcons.Forward,
             contentDescription = null,
             tint = AzkryTheme.colors.TextTertiary,
         )

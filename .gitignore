@@ -28,6 +28,13 @@ azkary_ios/build/
 .env.*
 secrets.properties
 
+# Release signing material. Losing these means never being able to update the
+# published app, and committing them means anyone can ship as you.
+*.jks
+*.keystore
+*.p12
+*.pepk
+
 # Claude Code local settings
 .claude/
 

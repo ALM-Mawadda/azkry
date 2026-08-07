@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
+import com.azkry.app.core.theme.AzkryIcons
 import com.azkry.app.core.theme.AzkryTheme
 import com.azkry.app.core.theme.AzkryRadius
 import com.azkry.app.core.theme.AzkrySpacing
@@ -34,8 +35,7 @@ import com.azkry.app.core.theme.AzkryTextStyles
  * title (plus optional subtitle), and a forward chevron — the primary
  * navigation row across home, adhkar categories, and settings pages.
  *
- * The chevron auto-mirrors, so in the app's RTL layout it points left as in
- * the design screenshots.
+ * The chevron is deliberately not auto-mirrored — see [AzkryIcons].
  */
 @Composable
 fun SectionRowCard(
@@ -50,7 +50,11 @@ fun SectionRowCard(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        // One row, one TalkBack stop: the title (and subtitle) announce the
+        // card, so the icon and chevron stay decorative with no description.
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {},
         shape = RoundedCornerShape(AzkryRadius.Card),
         color = AzkryTheme.colors.SurfaceCard,
         contentColor = AzkryTheme.colors.TextPrimary,
@@ -109,7 +113,7 @@ fun SectionRowCard(
             // Deliberately not auto-mirrored: the design's forward chevron
             // points left, which matches this RTL-only app's reading flow.
             Icon(
-                imageVector = Icons.Outlined.KeyboardArrowLeft,
+                imageVector = AzkryIcons.Forward,
                 contentDescription = null,
                 tint = AzkryTheme.colors.TextTertiary,
             )

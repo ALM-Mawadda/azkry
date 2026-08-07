@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.azkry.app.R
 import com.azkry.app.core.preview.AzkryPreview
 import com.azkry.app.core.preview.AzkryPreviewSurface
+import com.azkry.app.core.theme.AzkryIcons
 import com.azkry.app.core.theme.AzkryTheme
 import com.azkry.app.core.theme.AzkrySpacing
 import com.azkry.app.core.theme.AzkryTextStyles
@@ -43,7 +43,7 @@ fun ScreenHeader(
         // Deliberately not auto-mirrored: the design's back chevron points
         // right (toward the RTL reading start), where this button sits.
         CircleIconButton(
-            icon = Icons.Outlined.ArrowForward,
+            icon = AzkryIcons.BackArrow,
             contentDescription = stringResource(R.string.action_back),
             onClick = onBack,
             modifier = Modifier.align(Alignment.CenterStart),

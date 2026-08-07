@@ -105,6 +105,19 @@ settings → إشعارات الأذكار والأذان.
 | Backup export/import (JSON via SAF) | Working |
 | Adhan per-prayer sound selection, audio playback (streams) | Not started |
 
+## Releasing
+
+```bash
+./gradlew :app:bundleRelease
+```
+
+Produces the Play-ready AAB at `app/build/outputs/bundle/release/app-release.aab`.
+Requires `secrets.properties` (copy `secrets.properties.example`); packaging
+fails rather than falling back to debug signing. The full submission checklist —
+data safety answers, the exact-alarm declaration, store copy — is in
+[`docs/play-store-submission.md`](./docs/play-store-submission.md), and the
+privacy policy source text is [`PRIVACY.md`](./PRIVACY.md).
+
 ## Attribution
 
 Shown in-app at settings → التراخيص والمصادر, which is a licence obligation

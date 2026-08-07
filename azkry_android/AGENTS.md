@@ -175,7 +175,9 @@ The folders above are the default target shape. Add feature-local `models/` only
 
 - `release` build type runs R8 (`isMinifyEnabled = true` + `isShrinkResources = true`) with `proguard-rules.pro`. Keep rules cover Hilt, Kotlinx Serialization, Room, and coroutines.
 - Hilt and Room code generation use KSP. AGP built-in Kotlin is enabled; do not restore the legacy `org.jetbrains.kotlin.android`, kapt, or old-DSL compatibility switches.
-- Release signing reads `RELEASE_KEYSTORE_PATH`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` from `secrets.properties` (git-ignored). Release packaging fails when any credential is missing; release artifacts must never fall back to debug signing.
+- Release signing reads `RELEASE_KEYSTORE_PATH`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, `RELEASE_KEY_PASSWORD` from `secrets.properties` (git-ignored, template in `secrets.properties.example`). Release packaging fails when any credential is missing; release artifacts must never fall back to debug signing. Keystores (`*.jks`, `*.keystore`, `*.p12`, `*.pepk`) are git-ignored — never commit one.
+- Play distribution facts (data safety answers, the restricted-permission declarations, store copy) live in `docs/play-store-submission.md`. Update it in the same task when permissions, bundled assets, or the version change.
+- R8 building is not R8 working: after any dependency or keep-rule change, install the **release** build and exercise the app before shipping. Hilt/Room/Glance/serialization failures under minification only appear at runtime.
 
 ## Tests
 
@@ -187,6 +189,7 @@ The folders above are the default target shape. Add feature-local `models/` only
 ## Commands
 
 - Build debug APK: `./gradlew :app:assembleDebug`
+- Build the Play release bundle: `./gradlew :app:bundleRelease` (needs `secrets.properties` — see `secrets.properties.example`; packaging fails rather than falling back to debug signing)
 - Run unit tests: `./gradlew :app:testDebugUnitTest`
 - Run lint: `./gradlew :app:lintDebug`
 - CI parity command: `./gradlew :app:lintDebug :app:testDebugUnitTest :app:assembleDebug`
