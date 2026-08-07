@@ -10,7 +10,7 @@ class StaticPagesServiceTest {
     private val service = StaticPagesService()
 
     @Test
-    fun `hub lists every page key once, in reference order`() {
+    fun `hub lists every page key once, in the documented order`() {
         val keys = service.pages().map { it.key }
         assertEquals(PageKey.entries.toList(), keys)
     }

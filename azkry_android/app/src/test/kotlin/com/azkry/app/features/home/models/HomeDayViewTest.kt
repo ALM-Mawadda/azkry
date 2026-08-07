@@ -29,7 +29,7 @@ class HomeDayViewTest {
 
     @Test
     fun `strip frames now between the passed and upcoming events`() {
-        // Midday: sunrise has passed, dhuhr is next (the reference screenshot).
+        // Midday: sunrise has passed, dhuhr is next (worked example).
         assertEquals(
             Prayer.Sunrise to Prayer.Dhuhr,
             HomeDayView.stripEvents(LocalTime.of(12, 30), times),
@@ -59,7 +59,7 @@ class HomeDayViewTest {
 
     @Test
     fun `countdown phrase rounds minutes up with arabic plural rules`() {
-        // 3:08 left reads "4 دقائق" like the reference screenshot.
+        // 3:08 left reads "4 دقائق" as the design specifies.
         assertEquals("4 دقائق", HomeDayView.countdownPhrase(Duration.ofSeconds(3 * 60 + 8)))
         assertEquals("أقل من دقيقة", HomeDayView.countdownPhrase(Duration.ofSeconds(45)))
         assertEquals("دقيقة", HomeDayView.countdownPhrase(Duration.ofSeconds(60)))

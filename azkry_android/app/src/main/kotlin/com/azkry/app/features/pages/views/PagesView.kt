@@ -99,7 +99,7 @@ fun PagesContent(
     }
 }
 
-/** Icons chosen to mirror the reference screenshots row by row. */
+/** Icons chosen to mirror the design row by row. */
 fun pageIcon(key: PageKey): ImageVector = when (key) {
     PageKey.AsmaulHusna -> Icons.Outlined.AutoStories
     PageKey.Friday -> Icons.Outlined.CalendarMonth

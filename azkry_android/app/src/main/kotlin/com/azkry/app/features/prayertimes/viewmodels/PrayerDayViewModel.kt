@@ -80,7 +80,7 @@ class PrayerDayViewModel @Inject constructor(
 
     private val hijriOffsetDays = appSettingsService.settings.map { it.hijriOffsetDays }
 
-    // Seconds resolution: the next-prayer countdown ticks like the reference.
+    // Seconds resolution: the next-prayer countdown ticks like the design.
     private val ticker = flow {
         while (true) {
             emit(clock.instant())

@@ -8,9 +8,8 @@ import com.azkry.app.core.models.DhikrCategoryKeys
 
 /**
  * Bundled content for the adhkar tables. The main library (11 categories,
- * 339 items) ships as assets/adhkar/athkar_seed.json, extracted verbatim from
- * the reference iOS Athkar app's database; the tasbih/istighfar/hamd sets and
- * the exclusive-section categories stay Kotlin-defined below.
+ * 339 items) ships as assets/adhkar/athkar_seed.json; the tasbih/istighfar/hamd
+ * sets and the exclusive-section categories stay Kotlin-defined below.
  *
  * Seeding is revision-driven: bumping [CONTENT_REVISION] makes the next app
  * open atomically replace every seeded category with the current bundle

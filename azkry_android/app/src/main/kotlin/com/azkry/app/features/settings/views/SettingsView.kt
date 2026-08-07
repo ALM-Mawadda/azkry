@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.CloudDownload
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Schedule
@@ -52,6 +53,7 @@ data class SettingsNavigation(
     val onOpenNotificationSettings: () -> Unit,
     val onOpenHijriCalendar: () -> Unit,
     val onOpenExclusive: () -> Unit,
+    val onOpenLicenses: () -> Unit,
 )
 
 @Composable
@@ -134,6 +136,11 @@ fun SettingsView(
                     subtitle = stringResource(R.string.settings_language_value_arabic),
                     icon = Icons.Outlined.Language,
                     onClick = {},
+                )
+                SectionRowCard(
+                    title = stringResource(R.string.settings_licenses),
+                    icon = Icons.Outlined.Description,
+                    onClick = navigation.onOpenLicenses,
                 )
 
                 Text(

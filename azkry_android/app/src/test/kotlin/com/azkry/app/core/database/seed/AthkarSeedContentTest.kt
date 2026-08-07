@@ -6,9 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Validates the bundled adhkar library (extracted from the reference iOS
- * Athkar database) without an Android runtime: the JSON is read straight
- * from the assets directory on disk.
+ * Validates the bundled adhkar library without an Android runtime: the JSON is
+ * read straight from the assets directory on disk.
  */
 class AthkarSeedContentTest {
     private val content by lazy {
@@ -24,7 +23,7 @@ class AthkarSeedContentTest {
     }
 
     @Test
-    fun `category keys are unique and ordered like the reference app`() {
+    fun `category keys are unique and ordered as the app presents them`() {
         val keys = content.categories.map { it.key }
         assertEquals(keys.distinct(), keys)
         assertEquals(

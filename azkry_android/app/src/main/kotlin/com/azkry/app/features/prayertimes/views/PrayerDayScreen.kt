@@ -59,8 +59,8 @@ import com.azkry.app.features.prayertimes.viewmodels.PrayerDayViewModel
 import com.azkry.app.features.prayertimes.viewmodels.PrayerTimeRow
 
 /**
- * The الصلاة screen: a dedicated full-screen prayer board, like the
- * reference — its own city header, no home chrome behind it.
+ * The الصلاة screen: a dedicated full-screen prayer board with its own city
+ * header and no home chrome behind it.
  */
 @Composable
 fun PrayerDayScreen(
@@ -104,7 +104,7 @@ fun PrayerDayContent(
             onBack = onBack,
             actions = {
                 // Day stepping lives beside the title so the board itself
-                // stays as clean as the reference.
+                // stays as clean as the design.
                 IconButton(onClick = onNextDay) {
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowLeft,
@@ -332,7 +332,7 @@ private fun ForbiddenTimesRow(window: ForbiddenWindow, onClick: () -> Unit) {
     }
 }
 
-/** All six times in one grouped card, divided like the reference. */
+/** All six times in one grouped card, divided like the design. */
 @Composable
 private fun PrayerRowsCard(rows: List<PrayerTimeRow>) {
     PrayerCard {

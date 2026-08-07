@@ -7,7 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class PrayerDayViewTest {
-    // The reference screenshot's day: Fajr 4:19, Sunrise 6:08, Dhuhr 13:45,
+    // The worked example day: Fajr 4:19, Sunrise 6:08, Dhuhr 13:45,
     // Asr 17:51, Maghrib 21:22, Isha 23:11.
     private val times = mapOf(
         Prayer.Fajr to LocalTime.of(4, 19),
@@ -33,7 +33,7 @@ class PrayerDayViewTest {
     }
 
     @Test
-    fun `after asr window covers the reference moment`() {
+    fun `after asr window covers the sample moment`() {
         // 19:35 in the screenshot sits between Asr and Maghrib.
         assertEquals(
             ForbiddenWindow.AfterAsr,

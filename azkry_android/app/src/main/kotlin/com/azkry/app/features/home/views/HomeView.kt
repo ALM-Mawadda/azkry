@@ -146,12 +146,12 @@ fun HomeContent(
 ) {
     val listState = rememberLazyListState()
     // The sky header is item 0: once it scrolls away, the pinned bar grows
-    // the compact chrome (actions + wordmark), matching the reference app.
+    // the compact chrome (actions + wordmark), matching the design.
     val collapsed by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
     }
     // Content of the sky header fades progressively with the scroll offset,
-    // like the reference — the strip dims as it slides under the pinned bar.
+    // like the design — the strip dims as it slides under the pinned bar.
     val collapseRangePx = with(LocalDensity.current) { 180.dp.toPx() }
     val headerAlpha by remember(collapseRangePx) {
         derivedStateOf {
@@ -213,7 +213,7 @@ fun HomeContent(
     }
 }
 
-/** Translucent band the prayer strip sits on, like the reference. */
+/** Translucent band the prayer strip sits on, like the design. */
 private val StripBand = Color(0x21C7D4FF)
 
 /**
@@ -303,7 +303,7 @@ private fun PinnedBar(
     }
 }
 
-/** Indigo-ringed circles on the sky, like the reference header buttons. */
+/** Indigo-ringed circles on the sky, like the design header buttons. */
 private val SkyButtonFill = Color(0x59202A5C)
 private val SkyButtonRing = Color(0x805E6BB8)
 
@@ -319,7 +319,7 @@ private fun HeaderActionsRow(
 
     Box(modifier = Modifier.fillMaxWidth()) {
         // Reading-start side (visual right in RTL): the lone play button,
-        // matching the reference layout exactly.
+        // matching the design layout exactly.
         CircleIconButton(
             icon = Icons.Outlined.PlayArrow,
             contentDescription = stringResource(R.string.action_play),
@@ -340,7 +340,7 @@ private fun HeaderActionsRow(
         }
 
         // Opposite side (visual left): settings, search, bookmark reading
-        // left-to-right, as in the reference.
+        // left-to-right, as in the design.
         Row(
             modifier = Modifier.align(Alignment.CenterEnd),
             horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
@@ -382,7 +382,7 @@ private val ChipTuckBottom = 10.dp
 private val ChipCorner = 18.dp
 
 /**
- * The prayer strip as in the reference: a lighter full-width panel whose top
+ * The prayer strip as in the design: a lighter full-width panel whose top
  * line runs behind the taller hijri pill; the pill is the SAME fill as the
  * panel — both are drawn as one path so the overlap is seamless — and its
  * bottom is clipped, tucked under the tabs bar below. Prayer name and time
@@ -496,7 +496,7 @@ private fun PrayerStripTime(
     time: String,
     modifier: Modifier = Modifier,
 ) {
-    // Name and time are equally bold and white in the reference.
+    // Name and time are equally bold and white in the design.
     Row(
         modifier = modifier.padding(vertical = AzkrySpacing.S12),
         horizontalArrangement = Arrangement.spacedBy(AzkrySpacing.Sm),
@@ -622,7 +622,7 @@ private fun HomeSections(
         )
 
         // الأذكار والأدعية with the time-appropriate set nested inside,
-        // like the reference (أذكار الصباح at midday, المساء in the evening).
+        // like the design (أذكار الصباح at midday, المساء in the evening).
         NestedCard(
             mainTitle = stringResource(R.string.home_adhkar_duas),
             mainIcon = Icons.Outlined.AutoAwesome,
@@ -646,7 +646,7 @@ private fun HomeSections(
             onClick = navigation.onOpenAdhkar,
         )
 
-        // صفحات gains a الجمعة shortcut on Fridays, like the reference.
+        // صفحات gains a الجمعة shortcut on Fridays, like the design.
         NestedCard(
             mainTitle = stringResource(R.string.home_pages),
             mainIcon = Icons.Outlined.Dashboard,

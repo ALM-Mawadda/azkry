@@ -111,6 +111,15 @@
     <string name="settings_prayer_times">مواقيت الصلاة</string>
     <string name="settings_language">اللغة - Language</string>
     <string name="settings_language_value_arabic">العربية</string>
+
+    <!-- Licences: attribution required by the bundled works' licences -->
+    <string name="settings_licenses">التراخيص والمصادر</string>
+    <string name="licenses_intro">يعتمد هذا التطبيق على أعمال منشورة برخص مفتوحة. هذه مصادرها وحقوق أصحابها، وجميعها مستخدمة دون تعديل.</string>
+    <string name="license_quran">نص القرآن الكريم</string>
+    <string name="license_font_almarai">خط المراعي</string>
+    <string name="license_font_amiri">خطوط أميري</string>
+    <string name="license_adhan">تسجيل الأذان</string>
+    <string name="licenses_ofl_note">نص رخصة SIL Open Font License 1.1 كامل مرفق داخل التطبيق.</string>
     <string name="settings_appearance">المظهر</string>
     <string name="settings_appearance_value_dark">داكن</string>
 

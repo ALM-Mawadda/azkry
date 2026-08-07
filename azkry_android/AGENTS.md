@@ -1,13 +1,12 @@
 # Azkry Android Agent Notes
 
-Use this file as the operator guide for work inside `azkry_android/`. The goal is a native Kotlin/Compose adhkar app with the same discipline as the reference architecture: feature logic stays close to its screen, persistence contracts stay explicit, and shared code is earned. The app is Arabic-first, RTL, dark-first, and fully offline — all data lives in a local Room database.
+Use this file as the operator guide for work inside `azkry_android/`. The goal is a native Kotlin/Compose adhkar app with a disciplined architecture: feature logic stays close to its screen, persistence contracts stay explicit, and shared code is earned. The app is Arabic-first, RTL, dark-first, and fully offline — all data lives in a local Room database.
 
 ## Read First
 
 - `README.md`
 - `../AGENTS.md`
-- The "Design identity" section below — the written UI contract (the reference
-  iOS Athkar app's design; its screenshots are not kept in this public repo)
+- The "Design identity" section below — the written UI contract
 
 ## Package Map
 
@@ -52,15 +51,16 @@ app/src/main/kotlin/com/azkry/app/
     calendar/{models,viewmodels,views}       # hijri month grid (Umm al-Qura chronology)
     notifications/{models,services,receivers,viewmodels,views}
                                # reminder planning, alarm chain, boot receiver, toggles UI
-    settings/{services,viewmodels,views} # settings hub + versioned manual backup
+    settings/{models,services,viewmodels,views}
+                               # settings hub, versioned manual backup,
+                               # third-party licences screen
 ```
 
 Bundled data: `app/src/main/assets/quran/` holds the full Uthmani Quran text
 (public Tanzil text via the alquran.cloud dataset) as an `index.json` plus one
 JSON file per surah; `res/font/` bundles Almarai, Amiri, and Amiri Quran (all
 SIL OFL). `assets/adhkar/athkar_seed.json` is the main adhkar library
-(11 categories, 339 items) extracted verbatim from the reference iOS Athkar
-app's database — regenerate it with tooling from that source, never edit the
+(11 categories, 339 items) — regenerate it with tooling, never edit the
 Arabic by hand. Quranic passages in `StaticPagesService` are copied verbatim
 from `assets/quran/` — never retype Quranic text by hand; regenerate it so
 the tashkeel stays authoritative. Adhkar seeding is revision-driven and
@@ -110,6 +110,7 @@ The folders above are the default target shape. Add feature-local `models/` only
 - `core/preview/` owns `@AzkryPreview` (multi-preview annotation), `AzkryPreviewSurface` (theme-aware preview wrapper), and `Samples` (in-memory fixtures for `@Preview` composables and unit tests). Production code must never reference `Samples`.
 - `features/*` owns user-facing behavior. Screen-specific queries, state machines, and UI state belong inside the relevant feature. A feature may keep an internal `models/` folder for screen-only types and a `services/` folder for persistence access — services hold no UI state.
 - Adhkar content (categories, texts, repeat counts, sources) lives in the database, seeded from `core/database/seed/AdhkarSeed.kt`. Arabic content strings live in the database; UI chrome strings live in `res/values/strings.xml`.
+- Every third-party work bundled in the APK must be listed in `features/settings/models/AppLicense.kt` and reachable from settings → التراخيص والمصادر. The adhan recording (CC BY-SA 4.0) and the fonts (SIL OFL) require their notices to ship with the app, so this screen is a licence obligation, not an about page. Author names, licence names and URIs are legal text — never translate or reword them. The full OFL text ships at `assets/licenses/OFL-1.1.txt`; adding a bundled font or audio file means adding its entry in the same task.
 
 ## Logic Placement
 
@@ -117,7 +118,7 @@ The folders above are the default target shape. Add feature-local `models/` only
 - **ViewModels:** own `UiState`, orchestration, loading/error flags, and calls into services. Expose a single `StateFlow<UiState>` plus explicit intent functions.
 - **Services:** own Room/DataStore/computation side effects for a domain. Services are interfaces with a concrete `Room*`/`DataStore*`/`Calculated*` implementation bound in `AppModule` so tests can substitute fakes.
 - **Models:** database-shaped models go in `core/models`; screen-only types stay in the feature package.
-- **Navigation:** `features/main/MainShell.kt` owns root routing as plain Compose state (`rememberSaveable`), matching the reference architecture. Do not add a navigation library for new screens without an explicit decision.
+- **Navigation:** `features/main/MainShell.kt` owns root routing as plain Compose state (`rememberSaveable`), by deliberate choice. Do not add a navigation library for new screens without an explicit decision.
 - **Utilities:** must be tiny and cross-feature. If only one feature uses it, keep it in that feature.
 
 ## Abstraction Rules

@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 /**
- * Bundled adhkar content (assets/adhkar/athkar_seed.json), extracted verbatim
- * from the reference iOS Athkar library. The same types describe the extra
- * Kotlin-defined categories so seeding treats both sources uniformly.
+ * Bundled adhkar content (assets/adhkar/athkar_seed.json). The same types
+ * describe the extra Kotlin-defined categories so seeding treats both sources
+ * uniformly.
  */
 @Serializable
 data class SeedContent(val categories: List<SeedCategory>)

@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
         .map { it.hijriOffsetDays }
         .distinctUntilChanged()
 
-    // Seconds resolution: the countdown ticks like the reference app.
+    // Seconds resolution: the countdown ticks like the design.
     private val ticker = flow {
         while (true) {
             emit(Instant.now())

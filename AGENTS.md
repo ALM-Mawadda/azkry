@@ -27,10 +27,9 @@ Azkry (أذكاري) is an Arabic-first, offline-first Islamic adhkar app: praye
 - Keep Android implementation, Gradle commands, Compose screens, database schema, and app configuration in `azkry_android` docs.
 - Keep cross-platform product behavior and bundled religious data aligned, but
   let each platform own its implementation details and lifecycle behavior.
-- The visual contract is the reference iOS Athkar app (أذكار). Its screenshots
-  are kept out of this public repo; `DESIGN.md` is the durable cross-platform
-  contract. Each domain's `AGENTS.md` may add platform rules but must not make
-  the other platform's documentation its source of truth.
+- `DESIGN.md` is the durable cross-platform visual contract and the only source
+  of truth for the app's look. Each domain's `AGENTS.md` may add platform rules
+  but must not make the other platform's documentation its source of truth.
 - Use focused inspection and verification rather than broad repo-wide commands when possible.
 - Update the relevant domain docs in the same task when runtime behavior, commands, or invariants change.
 

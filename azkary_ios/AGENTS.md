@@ -178,8 +178,7 @@ needed. Keep feature-specific models within the feature; move a type to
 - Notifications are local. Schedule only the next relevant occurrence and
   re-plan after settings changes and app activation; do not maintain an
   unbounded queue of stale prayer alarms.
-- Religious content requires scholarly review before public release even when
-  it was imported from the reference app.
+- Religious content requires scholarly review before public release.
 - Every bundled adhkar category must remain reachable. The `x_` collections are
   intentionally separated behind the `حصريات` route, not omitted from the UI.
 

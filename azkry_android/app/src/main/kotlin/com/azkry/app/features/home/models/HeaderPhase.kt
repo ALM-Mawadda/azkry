@@ -67,8 +67,8 @@ object HomeDayView {
 
     /**
      * Coarse Arabic phrase for the countdown row ("٤ دقائق", "ساعة و٥٦ دقيقة").
-     * Minutes are rounded up so 3:08 left reads "بعد 4 دقائق" like the
-     * reference; western digits match the app's clock style.
+     * Minutes are rounded up so 3:08 left reads "بعد 4 دقائق"; western digits
+     * match the app's clock style.
      */
     fun countdownPhrase(remaining: Duration): String {
         val totalSeconds = remaining.seconds.coerceAtLeast(0)

@@ -26,6 +26,7 @@ import com.azkry.app.features.pages.views.PagesView
 import com.azkry.app.features.prayertimes.views.PrayerDayScreen
 import com.azkry.app.features.prayertimes.views.PrayerTimesSettingsView
 import com.azkry.app.features.search.views.SearchView
+import com.azkry.app.features.settings.views.LicensesView
 import com.azkry.app.features.settings.views.SettingsNavigation
 import com.azkry.app.features.settings.views.SettingsView
 import com.azkry.app.features.tracking.views.TrackingView
@@ -46,11 +47,12 @@ enum class MainScreen {
     PrayerTimesSettings,
     NotificationSettings,
     HijriCalendar,
+    Licenses,
 }
 
 /**
  * Root navigation for the single-role app: a state-driven shell (no nav
- * graph), matching the reference architecture. The dhikr reader and surah
+ * graph), matching this architecture. The dhikr reader and surah
  * reader layer on top so back returns to the launching screen.
  */
 @Composable
@@ -118,6 +120,7 @@ fun MainShell(
             screen == MainScreen.PrayerTimesSettings -> screen = MainScreen.Settings
             screen == MainScreen.NotificationSettings -> screen = MainScreen.Settings
             screen == MainScreen.HijriCalendar -> screen = MainScreen.Settings
+            screen == MainScreen.Licenses -> screen = MainScreen.Settings
             screen == MainScreen.Friday && fridayFromPages -> {
                 fridayFromPages = false
                 screen = MainScreen.Pages
@@ -230,6 +233,7 @@ fun MainShell(
                 onOpenNotificationSettings = { screen = MainScreen.NotificationSettings },
                 onOpenHijriCalendar = { screen = MainScreen.HijriCalendar },
                 onOpenExclusive = { screen = MainScreen.Exclusive },
+                onOpenLicenses = { screen = MainScreen.Licenses },
             ),
         )
 
@@ -242,6 +246,10 @@ fun MainShell(
         )
 
         MainScreen.HijriCalendar -> HijriCalendarView(
+            onBack = { screen = MainScreen.Settings },
+        )
+
+        MainScreen.Licenses -> LicensesView(
             onBack = { screen = MainScreen.Settings },
         )
     }
