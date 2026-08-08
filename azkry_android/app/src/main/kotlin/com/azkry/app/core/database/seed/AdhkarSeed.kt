@@ -17,7 +17,7 @@ import com.azkry.app.core.models.DhikrCategoryKeys
  */
 object AdhkarSeed {
     /** Bump when the bundled content changes shape or text. */
-    const val CONTENT_REVISION = 2
+    const val CONTENT_REVISION = 3
 
     private const val SEED_ASSET = "adhkar/athkar_seed.json"
 
