@@ -66,14 +66,18 @@ class AthkarSeedContentTest {
     @Test
     fun `a title is a label, never a repeat of the dhikr body`() {
         // The imported data used its title field as a list preview, so about
-        // half the items carried the dua text twice — once lightly vocalised
-        // as the title, once fully vocalised as the body. The card renders
-        // both, so any overlap shows up as duplicated text on screen.
+        // half the items carried the dua twice — once lightly vocalised as the
+        // title, once fully vocalised as the body. The card renders both, so
+        // the repeat shows up as duplicated text on screen.
+        //
+        // Matched by shared word runs rather than substring: the two copies
+        // were typed independently and drift ("أنت خلقت" vs "إنك خلقت"), so an
+        // exact containment check silently misses them. A real label overlaps
+        // its body by at most 4 words; liturgical text runs far longer.
         val offenders = content.categories.flatMap { category ->
             category.items.map { category.key to it }
         }.filter { (_, item) ->
-            val title = arabicOnly(item.title)
-            title.length >= 12 && title in arabicOnly(item.text)
+            longestSharedRun(arabicWords(item.title), arabicWords(item.text)) >= 5
         }.map { (key, item) -> "$key: ${item.title?.take(40)}" }
 
         assertEquals(emptyList<String>(), offenders)
@@ -105,6 +109,35 @@ class AthkarSeedContentTest {
             .replace(Regex("[أإآٱ]"), "ا")
             .replace('ة', 'ه').replace('ى', 'ي').replace('ؤ', 'و').replace('ئ', 'ي')
             .filter { it in 'ء'..'ي' }
+
+    private fun arabicWords(value: String?): List<String> =
+        Normalizer.normalize(value ?: "", Normalizer.Form.NFKC)
+            .replace(Regex("\\p{Mn}"), "")
+            .replace("ـ", "")
+            .replace(Regex("[أإآٱ]"), "ا")
+            .replace('ة', 'ه').replace('ى', 'ي').replace('ؤ', 'و').replace('ئ', 'ي')
+            .map { if (it in 'ء'..'ي') it else ' ' }
+            .joinToString("")
+            .split(' ')
+            .filter { it.isNotEmpty() }
+
+    /** Longest run of words appearing consecutively in both lists. */
+    private fun longestSharedRun(a: List<String>, b: List<String>): Int {
+        if (a.isEmpty() || b.isEmpty()) return 0
+        var best = 0
+        var previous = IntArray(b.size + 1)
+        for (word in a) {
+            val current = IntArray(b.size + 1)
+            for (j in b.indices) {
+                if (word == b[j]) {
+                    current[j + 1] = previous[j] + 1
+                    if (current[j + 1] > best) best = current[j + 1]
+                }
+            }
+            previous = current
+        }
+        return best
+    }
 
     @Test
     fun `no html leaks into the extracted texts`() {
